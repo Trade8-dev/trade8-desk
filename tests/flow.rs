@@ -6,6 +6,15 @@
 //! Cross-service flow tests (test-architecture design §6): the
 //! two-phase submit path end-to-end with a Risk test double.
 //!
+//! TREE-LAYOUT-ONLY: the risk double embeds the REAL risk engine via a
+//! `#[path = "../../risk/src/core.rs"]` include — a cross-repo path that
+//! resolves ONLY in the aggregation-tree layout (both repos checked out
+//! side by side). Single-repo checkouts (CI) cannot resolve it; the
+//! include is feature-gated so the tree operator runs these flows with
+//! `--features cross_repo_flows` (backlog T8-HARNESS-1 tracks the
+//! SDK-side replacement).
+#![cfg(feature = "cross_repo_flows")]
+//!
 //! Phases exercised in one running engine (the REAL desk + risk code, not
 //! mocks):
 //!   1. **Phase 1 (park)** — `DeskEngine::submit_pending` parks the order

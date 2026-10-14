@@ -41,13 +41,7 @@ impl DeskWiring {
     pub async fn build(auth_issuer: &str) -> Self {
         let risk = match std::env::var("TRADE8_RISK_URL") {
             Ok(url) if !url.is_empty() => {
-                match trade8::client::build_caller(
-                    auth_issuer,
-                    &url,
-                    "trade8:desk",
-                )
-                .await
-                {
+                match trade8::client::build_caller(auth_issuer, &url, "trade8:desk").await {
                     Ok(c) => Some(Arc::new(c)),
                     Err(e) => {
                         tracing::warn!(error = %e, "desk: risk caller unavailable (risk checks off)");
@@ -59,13 +53,7 @@ impl DeskWiring {
         };
         let feed = match std::env::var("TRADE8_FEED_URL") {
             Ok(url) if !url.is_empty() => {
-                match trade8::client::build_caller(
-                    auth_issuer,
-                    &url,
-                    "trade8:desk:feed",
-                )
-                .await
-                {
+                match trade8::client::build_caller(auth_issuer, &url, "trade8:desk:feed").await {
                     Ok(c) => Some(Arc::new(c)),
                     Err(e) => {
                         tracing::warn!(error = %e, "desk: feed reader unavailable (no bbo marks)");

@@ -27,12 +27,19 @@ use std::sync::Arc;
 use trade8::contracts::risk::LimitRow;
 
 /// Risk's REAL check pipeline, embedded verbatim from the risk service
-/// (`services/risk/src/core.rs`). `core.rs` imports only
+/// (`trade8-risk/src/core.rs`). `core.rs` imports only
 /// `trade8::contracts` + `arc_swap` — both are desk dependencies, so the
 /// embed needs no extra crate wiring.
-#[path = "../../risk/src/core.rs"]
-#[allow(dead_code)]
-pub mod risk_core;
+///
+/// Embedded via `include!` inside a feature-gated inline `mod`
+/// (tree-layout-only flow tests — see `tests/flow.rs` header and
+/// DESIGN.md §9): `include!` is opaque to rustfmt, so single-repo CI's
+/// blocking fmt gate stays green, and the path resolves only with
+/// `--features cross_repo_flows` (the aggregation-tree layout).
+#[cfg(feature = "cross_repo_flows")]
+pub mod risk_core {
+    include!("../../trade8-risk/src/core.rs");
+}
 
 /// The Risk double: the real engine + the fixture snapshot seeders.
 pub struct RiskDouble {

@@ -414,6 +414,14 @@ graph TD
   catalog bootstrap.
 - **`tests/policy.rs`**: no-set → deny; shadow never blocks; enforce → 403 +
   Stat; M2M parity; hot reload; live-role freshness; mirror-covers-actions parity.
+- **`tests/flow.rs`** (tree-layout-only, `--features cross_repo_flows`):
+  the cross-service flow tests with the Risk test double
+  (`src/risk_double.rs`). The double embeds Risk's REAL engine core
+  (`trade8-risk/src/core.rs`) via `include!` inside a feature-gated inline
+  `mod` — the include path is opaque to rustfmt (single-repo CI's blocking
+  fmt gate stays green) and resolves only when the feature is on, which
+  requires the aggregation-tree layout (trade8-risk checked out side by
+  side). A single-repo `cargo test` runs 0 tests from this target.
 - Deliberately **not** tested here: Router broker wire behavior (Router design),
   limit math (Risk), bus delivery guarantees (platform bus tests), Flutter UX
   (apps design).

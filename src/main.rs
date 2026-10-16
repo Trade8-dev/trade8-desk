@@ -129,7 +129,10 @@ fn extend_router(app: Router<Arc<DeskState>>, _state: Arc<DeskState>) -> Router<
         )
         .route(
             "/v1/health",
-            get(|| async { Json(serde_json::json!({"status": "ok", "service": "trade8:desk"})) }),
+            // Carries the binary's build identity (`version`/`build`,
+            // BUILDID-1) so captain's monitor populates `make status`'s
+            // VERSION column — the consuming BINARY's identity.
+            get(|| async { Json(serde_json::json!({"status": "ok", "service": "trade8:desk", "version": sentin8::build_info::id(), "build": sentin8::build_info::build_hash()})) }),
         )
 }
 

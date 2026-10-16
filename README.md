@@ -52,13 +52,13 @@ graph TD
     subgraph desk[Trade8:Desk process]
         API[HTTP handlers<br/>main.rs] --> POL[Shield policy gate<br/>sentin8::shell::policy]
         POL --> ENG[DeskEngine<br/>state machine + catalog + borrow]
-        API --> WS[/ws order-entry channel]
+        API --> WS[/"ws order-entry channel"/]
         WS --> ENG
         ENG --> CAT[Catalog cache<br/>in-memory snapshots]
         ENG --> BOR[borrow module<br/>locate pool + blocks]
         ENG --> SES[session module<br/>session FSM]
         API --> ST[store.rs<br/>persist + outbox rows]
-        ST -- same tx --> PG[(desk schema<br/>db trade8)]
+        ST -- same tx --> PG[("desk schema<br/>db trade8")]
         ST -- outbox row --> OB[desk.outbox]
     end
     OB -- "shell boot relay / NOTIFY desk_outbox_changed + 5s poll" --> BUS[sentin8:bus<br/>POST /v1/produce]

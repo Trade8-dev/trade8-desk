@@ -110,12 +110,12 @@ sequenceDiagram
     else deny
         R-->>D: verdict deny + trace
         D->>E: reject_pending(code)
-        D->>DB: set context; tx: order row (rejected) + order_event + outbox(order:rejected) + audit
+        D->>DB: set context, tx: order row (rejected) + order_event + outbox(order:rejected) + audit
         D-->>T: 422 {code, message, params}
     else allow
         R-->>D: verdict allow + remaining_buying_power
         D->>E: accept_pending (locate reserve if short)
-        D->>DB: set context; begin(); persist_order_accepted (order + transition + outbox submitted/accepted + borrow) single tx
+        D->>DB: set context, begin(), persist_order_accepted (order + transition + outbox submitted/accepted + borrow) single tx
         D-->>T: 200 {order_id, state, remaining_buying_power}
         Note over O,DB: relay later drains outbox rows → bus consumers (Router/Risk/Pnl)
     end
@@ -131,7 +131,7 @@ sequenceDiagram
     participant R as Risk
     participant DB as DB
     C->>D: POST /v1/orders/batch (BasketRequest)
-    loop per item (skip none; per-item risk)
+    loop per item (skip none, per-item risk)
         D->>R: authorize(intent Open) for each item
         D->>DB: per-item persist tx (accepted/rejected + events + outbox)
     end
@@ -141,7 +141,7 @@ sequenceDiagram
     C->>D: POST /v1/session {action: open|close|close_pending|preopen}
     D->>DB: session FSM event + outbox(trade8:desk:session:state)
     alt action = close
-        D->>DB: park overnight-TIF orders to desk.overnight_order; cancel day-TIF remnants
+        D->>DB: park overnight-TIF orders to desk.overnight_order, cancel day-TIF remnants
     end
 ```
 
@@ -288,7 +288,7 @@ sequenceDiagram
     B->>RISK: SSE consume (group trade8:risk:desk, filters accepted/cancelled/rejected/replaced/routed) → ACK
     B->>PNL: SSE consume (group trade8:pnl:desk, filters session:state, order:overnight:restored) → ACK
     B->>F: declarative trigger (vertical-registry event_triggers) on ::order:flatten → on_flatten hook
-    Note over B,PNL: consumer failure → Nack → redelivery; poison → DLQ + manual replay
+    Note over H,F: consumer failure → Nack → redelivery, poison → DLQ + manual replay
 ```
 
 ## 5. Cross-Cutting Concerns
@@ -399,7 +399,7 @@ graph LR
 
 ```mermaid
 graph TD
-    U[Unit: engine state machine, borrow math, catalog parsing — in-file #[cfg test]] --> I[Integration: tests/sql_matrix.rs — real DB, service role + trade8_probe]
+    U["Unit: engine state machine, borrow math, catalog parsing — in-file #[cfg test]"] --> I[Integration: tests/sql_matrix.rs — real DB, service role + trade8_probe]
     I --> P[Policy: tests/policy.rs — Shield engine vs declared policy seed]
     I --> E2E[E2E: e2e-ts UI via BFF proxy — submit → blotter → cancel]
     P --> L[Latency harness: submit/cancel P50 budget in-file]

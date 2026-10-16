@@ -45,6 +45,5 @@ tracing = "0.1"
 uuid = { version = "1", features = ["v4", "v5", "v7", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring", "postgres", "uuid", "chrono", "json", "macros", "rust_decimal"] }
-mimalloc = "0.1"
 tower = { version = "0.5", features = ["util", "util"], default-features = false }
 http-body-util = "0.1"

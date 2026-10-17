@@ -1,4 +1,4 @@
-# DESIGN.md: Trade8:Desk — Detailed Design Document
+# Trade8:Desk — Detailed Design Document
 
 > Audience: maintainers, reviewers, and architects modifying the service.
 > Overview in `README.md`; business functionality in `BUSINESS.md`.

@@ -64,6 +64,17 @@ fn card(title: &str, body: &str) -> RemoteWidget {
         actions: vec![],
     })
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/ui/{page}",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/ui/{page}` — the RFW definitions.
 pub async fn get_admin_ui(
@@ -202,6 +213,17 @@ type Qp = std::collections::HashMap<String, String>;
 fn q_i64(q: &Qp, key: &str, default: i64) -> i64 {
     q.get(key).and_then(|v| v.parse().ok()).unwrap_or(default)
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/orders",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/orders` — env-wide order rows (admin scope).
 pub async fn admin_orders(
@@ -280,6 +302,17 @@ pub async fn admin_orders(
         )
         .collect::<Vec<_>>())))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/overview",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/overview` — session + counts card.
 pub async fn admin_overview(
@@ -318,6 +351,17 @@ pub async fn admin_overview(
         "working": working, "today": today, "parked": parked,
     }])))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/symbols",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/symbols`
 pub async fn admin_symbols(
@@ -342,6 +386,17 @@ pub async fn admin_symbols(
     let rows = st.engine.symbols_json();
     Ok(Json(serde_json::json!(rows)))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/markets",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/markets`
 pub async fn admin_markets(
@@ -384,6 +439,17 @@ pub async fn admin_markets(
         )
         .collect::<Vec<_>>())))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/destinations",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/destinations`
 pub async fn admin_destinations(
@@ -428,6 +494,17 @@ pub async fn admin_destinations(
         )
         .collect::<Vec<_>>())))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/offices",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/offices`
 pub async fn admin_offices(
@@ -468,6 +545,17 @@ pub async fn admin_offices(
         })
         .collect::<Vec<_>>())))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/borrow",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/borrow` — short pool + category + exempt rows.
 pub async fn admin_borrow(
@@ -509,6 +597,17 @@ pub async fn admin_borrow(
         })
         .collect::<Vec<_>>())))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/admin/session",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `GET /v1/admin/session`
 pub async fn admin_session(
@@ -528,6 +627,17 @@ pub async fn admin_session(
         "working": st.engine.working_count(),
     }])))
 }
+#[utoipa::path(
+    post,
+    path = "/v1/admin/session",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "trade8-admin",
+)]
 
 /// `POST /v1/admin/session` — RFW POST-alias for the session action
 /// (the renderer can't issue raw POST bodies to /v1/session ops).

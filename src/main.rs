@@ -19,6 +19,7 @@ mod borrow;
 mod catalog;
 mod engine;
 mod registration;
+mod openapi;
 mod session;
 mod store;
 mod wiring;
@@ -143,11 +144,22 @@ fn rej_http(rej: &Rejection) -> (axum::http::StatusCode, String) {
         serde_json::to_string(rej).unwrap_or_else(|_| "order rejected".into()),
     )
 }
+#[utoipa::path(
+    post,
+    path = "/v1/orders",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// The Risk-gated submit path: structural validation parks a
 /// Pending order → Risk `authorize` (fail-closed) → accept or reject,
 /// each persisted with journal + outbox rows in one tx.
-async fn submit_order(
+pub(crate) async fn submit_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(req): Json<NewOrderRequest>,
@@ -288,11 +300,22 @@ async fn submit_rejected(
     tx.commit().await.ok();
     Err(rej_http(&rej))
 }
+#[utoipa::path(
+    post,
+    path = "/v1/orders/batch",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Basket submission: per-item validation + accept/reject, one
 /// batch event. Each accepted item persists independently — a failing
 /// item rejects only itself. Every item passes the Risk gate.
-async fn submit_batch(
+pub(crate) async fn submit_batch(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(reqs): Json<Vec<NewOrderRequest>>,
@@ -399,10 +422,21 @@ async fn submit_batch(
         serde_json::json!({"accepted": accepted, "rejected": rejected}),
     ))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/orders",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Blotter read: DB-backed with in-memory fallback when the DB is
 /// unavailable (degraded-read mode keeps the desk usable).
-async fn list_orders(
+pub(crate) async fn list_orders(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Query(q): Query<std::collections::HashMap<String, String>>,
@@ -452,8 +486,19 @@ async fn list_orders(
         }
     }
 }
+#[utoipa::path(
+    get,
+    path = "/v1/orders/{id}",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn get_order(
+pub(crate) async fn get_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
@@ -495,8 +540,19 @@ async fn get_order(
         Err(e) => Err(sentin8::shell::err_db(e)),
     }
 }
+#[utoipa::path(
+    delete,
+    path = "/v1/orders/{id}",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn cancel_order(
+pub(crate) async fn cancel_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
@@ -551,8 +607,19 @@ async fn cancel_order(
         Err(rej) => Err(rej_http(&rej)),
     }
 }
+#[utoipa::path(
+    post,
+    path = "/v1/orders/{id}/replace",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn replace_order(
+pub(crate) async fn replace_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
@@ -599,8 +666,19 @@ async fn replace_order(
         Err(rej) => Err(rej_http(&rej)),
     }
 }
+#[utoipa::path(
+    post,
+    path = "/v1/positions/flatten",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn flatten(
+pub(crate) async fn flatten(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(req): Json<FlattenRequest>,
@@ -649,8 +727,19 @@ async fn flatten(
     tx.commit().await.ok(); // dropping an uncommitted tx rolls back
     Ok(Json(serde_json::json!({"flatten_orders_submitted": count})))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/session",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn session_state(
+pub(crate) async fn session_state(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
 ) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
@@ -666,12 +755,23 @@ async fn session_state(
         serde_json::json!({"state": st.engine.session_state().as_str()}),
     ))
 }
+#[utoipa::path(
+    post,
+    path = "/v1/session",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Session action (Cron proxy-back + manual ops). Transitions persist a
 /// `session:state` outbox event; the close transition sweeps day orders
 /// (cancel) and parks overnight ones — engine + DB in the same handler
 /// (session FSM); preopen restores parked orders from the DB.
-async fn session_action(
+pub(crate) async fn session_action(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(body): Json<serde_json::Value>,
@@ -807,8 +907,19 @@ async fn restore_overnight(
     }
     n
 }
+#[utoipa::path(
+    get,
+    path = "/v1/symbols",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
-async fn list_symbols(
+pub(crate) async fn list_symbols(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
 ) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
@@ -822,9 +933,20 @@ async fn list_symbols(
     .await?;
     Ok(Json(st.engine.symbols_json()))
 }
+#[utoipa::path(
+    get,
+    path = "/v1/borrow",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Borrow pool read (admin surface): per-symbol availability.
-async fn borrow_read(
+pub(crate) async fn borrow_read(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Query(q): Query<std::collections::HashMap<String, String>>,
@@ -862,10 +984,21 @@ async fn borrow_read(
         .collect();
     Ok(Json(serde_json::json!({"pool": rows})))
 }
+#[utoipa::path(
+    post,
+    path = "/v1/borrow",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Borrow mutation (locate-approval action): pool totals, office
 /// blocks, ETB/HTB classification, exempt toggles. DB + engine + event.
-async fn borrow_mutate(
+pub(crate) async fn borrow_mutate(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(m): Json<store::BorrowMutation>,
@@ -903,12 +1036,23 @@ async fn borrow_mutate(
         serde_json::json!({"symbol_id": m.symbol_id, "status": "ok"}),
     ))
 }
+#[utoipa::path(
+    get,
+    path = "/ws",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// WS order entry — the bidirectional tier. Same authorization
 /// (Bearer on the upgrade request) + same submit path as REST; the
 /// client replays `idempotency_key` in `client_order_id` so resubmits
 /// are deduped by the engine (replay-safe).
-async fn ws_entry(
+pub(crate) async fn ws_entry(
     ws: WebSocketUpgrade,
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
@@ -986,11 +1130,22 @@ async fn ws_loop(mut socket: WebSocket, st: Arc<DeskState>) {
         }
     }
 }
+#[utoipa::path(
+    post,
+    path = "/v1/internal/func-host/orders",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk-internal",
+)]
 
 /// Func proxy-back — `POST /v1/internal/func-host/orders`:
 /// submit on behalf of a strategy module (attribution via
 /// `on_behalf_of`; the acting user is the strategy's owner).
-async fn func_host_submit(
+pub(crate) async fn func_host_submit(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(host): Json<wiring::func_host::HostSubmit>,
@@ -1017,9 +1172,20 @@ async fn func_host_submit(
         Err(r) => Err(rej_http(&r)),
     }
 }
+#[utoipa::path(
+    get,
+    path = "/v1/internal/func-host/orders/{id}",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk-internal",
+)]
 
 /// Func proxy-back — `GET /v1/internal/func-host/orders/{id}`.
-async fn func_host_get(
+pub(crate) async fn func_host_get(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
@@ -1037,9 +1203,20 @@ async fn func_host_get(
         None => Err((axum::http::StatusCode::NOT_FOUND, "order not found".into())),
     }
 }
+#[utoipa::path(
+    post,
+    path = "/v1/internal/func-host/orders/{id}/cancel",
+    responses(
+        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 401, description = "Not authenticated"),
+        (status = 403, description = "Forbidden"),
+    ),
+    security(),
+    tag = "desk",
+)]
 
 /// Func proxy-back — `POST /v1/internal/func-host/orders/{id}/cancel`.
-async fn func_host_cancel(
+pub(crate) async fn func_host_cancel(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,

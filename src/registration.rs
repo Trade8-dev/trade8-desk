@@ -9,6 +9,8 @@
 //! `sentin8-service-self-registration-design.md`). Scopes per master
 //! design §9; pages per desk design §8; SQL = services/desk/sql/init.sql.
 
+use utoipa::OpenApi;
+
 use sentin8::registration::{
     AdminScope, AdminUi, AdminUiPage, ErrorCode, M2mGrant, PgRole, PolicySetDecl, Registration,
     RelationDecl, SqlMigration,
@@ -264,7 +266,7 @@ const M2M_GRANTS: &[M2mGrant] = &[
 const SQL_1_INIT: &str = include_str!("../sql/init.sql");
 
 fn empty_openapi() -> serde_json::Value {
-    serde_json::Value::Null
+    serde_json::to_value(crate::openapi::DeskOpenApi::openapi()).unwrap_or(serde_json::Value::Null)
 }
 
 pub fn print(section: Option<String>) -> anyhow::Result<()> {

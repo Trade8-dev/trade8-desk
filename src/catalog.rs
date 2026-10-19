@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Catalog caches — arc-swap snapshots of the reference tables,
+//! Catalog caches - arc-swap snapshots of the reference tables,
 //! loaded at startup and invalidated by `catalog:updated` events.
 //!
 //! Design: `../desk/DESIGN.md` §4.3.
@@ -16,7 +16,7 @@ use arc_swap::ArcSwap;
 use trade8::fixed::Price;
 use uuid::Uuid;
 
-/// A catalog snapshot — one immutable generation, swapped atomically.
+/// A catalog snapshot - one immutable generation, swapped atomically.
 #[derive(Debug, Default, Clone)]
 pub struct CatalogSnapshot {
     pub symbols: HashMap<String, SymbolRow>,
@@ -34,7 +34,7 @@ pub struct SymbolRowRaw {
     pub symbol_id: Uuid,
     pub market_id: Uuid,
     pub name: String,
-    /// Postgres has no u8 — the SQL casts to int; converted into
+    /// Postgres has no u8 - the SQL casts to int; converted into
     /// [`SymbolRow::price_scale`] at bootstrap.
     pub price_scale: i32,
     pub tick_rule_id: Uuid,

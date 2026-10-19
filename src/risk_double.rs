@@ -5,12 +5,12 @@
 
 //! The Risk test double for the cross-service flow tests
 //! (desk flow tests; test-architecture design §6). This module lives under `src/`
-//! but is compiled ONLY by the desk test targets — `main.rs` never
+//! but is compiled ONLY by the desk test targets - `main.rs` never
 //! references it, so the production binary excludes it entirely.
 //!
 //! Design (desk design §4.2): Desk's order pipeline
 //! delegates ALL policy checks to Risk in ONE batch `authorize` call.
-//! The double is NOT a mock of the verdict logic — it hosts Risk's REAL
+//! The double is NOT a mock of the verdict logic - it hosts Risk's REAL
 //! `RiskEngine` (embedded `#[path] = "../../risk/src/core.rs"`, the exact
 //! production check pipeline) behind the wire-shaped
 //! `AuthorizeRequest`/`AuthorizeVerdict` contract, so the flow tests
@@ -28,11 +28,11 @@ use trade8::contracts::risk::LimitRow;
 
 /// Risk's REAL check pipeline, embedded verbatim from the risk service
 /// (`trade8-risk/src/core.rs`). `core.rs` imports only
-/// `trade8::contracts` + `arc_swap` — both are desk dependencies, so the
+/// `trade8::contracts` + `arc_swap` - both are desk dependencies, so the
 /// embed needs no extra crate wiring.
 ///
 /// Embedded via `include!` inside a feature-gated inline `mod`
-/// (tree-layout-only flow tests — see `tests/flow.rs` header and
+/// (tree-layout-only flow tests - see `tests/flow.rs` header and
 /// DESIGN.md §9): `include!` is opaque to rustfmt, so single-repo CI's
 /// blocking fmt gate stays green, and the path resolves only with
 /// `--features cross_repo_flows` (the aggregation-tree layout).
@@ -75,7 +75,7 @@ impl RiskDouble {
 }
 
 /// A buying-power limit row bound to everyone in the env
-/// (`usr_id`/`office_id` both None — the env-level default binding).
+/// (`usr_id`/`office_id` both None - the env-level default binding).
 pub fn limit(value: i128) -> LimitRow {
     LimitRow {
         usr_id: None,
@@ -95,10 +95,10 @@ pub fn limit(value: i128) -> LimitRow {
 /// assert both branches' contracts without a live network stack.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiskDoubleWiring {
-    /// `DeskWiring { risk: None, .. }` — Risk not enrolled (local dev):
+    /// `DeskWiring { risk: None, .. }` - Risk not enrolled (local dev):
     /// structurally allow, empty trace (desk design §4.2).
     NotEnrolled,
-    /// Risk unreachable: fail CLOSED — the outage rejection
+    /// Risk unreachable: fail CLOSED - the outage rejection
     /// (`trade8_risk_trader_disabled` + `unavailable: true` param), never
     /// an allow.
     Down,

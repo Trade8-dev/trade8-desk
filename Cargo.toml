@@ -19,10 +19,10 @@ path = "src/main.rs"
 [features]
 default = []
 # Tree-layout-only flow tests: enables the cross-repo `#[path]` embed of
-# the real risk engine (tests/flow.rs — see its header). CI (single-repo
+# the real risk engine (tests/flow.rs - see its header). CI (single-repo
 # checkout) leaves this OFF; the aggregation-tree operator turns it on.
 cross_repo_flows = []
-# Never compiled as-is (see src/main.rs handler_tests gate) — placeholder
+# Never compiled as-is (see src/main.rs handler_tests gate) - placeholder
 # for the SDK-side test-harness OIDC stand-in (backlog T8-HARNESS-1).
 handler_tests = []
 

@@ -3,10 +3,10 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Trade8:Desk admin UI — RFW page definitions + data endpoints.
+//! Trade8:Desk admin UI - RFW page definitions + data endpoints.
 //!
 //! Pages are served at `GET /v1/admin/ui/{page}` and rendered by
-//! Sentin8:Dash at runtime (zero compile-time vertical knowledge —
+//! Sentin8:Dash at runtime (zero compile-time vertical knowledge -
 //! architecture-principles.md §4.15). The RFW renderer only supports
 //! POST for mutations, so update/delete carry POST alias routes.
 //! Icons are Material Icons code points (hex strings).
@@ -76,7 +76,7 @@ fn card(title: &str, body: &str) -> RemoteWidget {
     tag = "trade8-admin",
 )]
 
-/// `GET /v1/admin/ui/{page}` — the RFW definitions.
+/// `GET /v1/admin/ui/{page}` - the RFW definitions.
 pub async fn get_admin_ui(
     State(_st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
@@ -225,7 +225,7 @@ fn q_i64(q: &Qp, key: &str, default: i64) -> i64 {
     tag = "trade8-admin",
 )]
 
-/// `GET /v1/admin/orders` — env-wide order rows (admin scope).
+/// `GET /v1/admin/orders` - env-wide order rows (admin scope).
 pub async fn admin_orders(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
@@ -314,7 +314,7 @@ pub async fn admin_orders(
     tag = "trade8-admin",
 )]
 
-/// `GET /v1/admin/overview` — session + counts card.
+/// `GET /v1/admin/overview` - session + counts card.
 pub async fn admin_overview(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
@@ -472,7 +472,7 @@ pub async fn admin_destinations(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // credentials_ref is a secret *reference* — safe to show masked.
+    // credentials_ref is a secret *reference* - safe to show masked.
     let rows: Vec<(Uuid, String, String, String, i64, bool)> = sqlx::query_as(
         r#"SELECT destination_id, name, protocol, endpoint_url, min_size, enable
            FROM desk.destination WHERE env_id = $1 ORDER BY name"#,
@@ -557,7 +557,7 @@ pub async fn admin_offices(
     tag = "trade8-admin",
 )]
 
-/// `GET /v1/admin/borrow` — short pool + category + exempt rows.
+/// `GET /v1/admin/borrow` - short pool + category + exempt rows.
 pub async fn admin_borrow(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
@@ -639,7 +639,7 @@ pub async fn admin_session(
     tag = "trade8-admin",
 )]
 
-/// `POST /v1/admin/session` — RFW POST-alias for the session action
+/// `POST /v1/admin/session` - RFW POST-alias for the session action
 /// (the renderer can't issue raw POST bodies to /v1/session ops).
 pub async fn admin_session_action(
     State(st): State<std::sync::Arc<DeskState>>,

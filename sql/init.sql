@@ -3,10 +3,10 @@
 -- SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 -- SPDX-License-Identifier: Apache-2.0
 
--- Trade8:Desk — order lifecycle, catalogs, borrow pool, offices, keystroke log.
+-- Trade8:Desk - order lifecycle, catalogs, borrow pool, offices, keystroke log.
 --
 -- Design: ../desk/DESIGN.md §6,
--- ../../DESIGN.md §3 (data model) §2.1–2.3, §2.5.
+-- ../../DESIGN.md §3 (data model) §2.1-2.3, §2.5.
 -- No migration code (new platform): `sentin8-cli vertical init` applies this.
 
 CREATE SCHEMA IF NOT EXISTS desk;
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS desk.destination (
  name TEXT NOT NULL,
  protocol TEXT NOT NULL CHECK (protocol IN ('fix42','fix44','ouch31')),
  endpoint_url TEXT NOT NULL,
- credentials_ref TEXT NOT NULL, -- secret reference — never a value
+ credentials_ref TEXT NOT NULL, -- secret reference - never a value
  currency_code TEXT NOT NULL,
  min_size BIGINT NOT NULL DEFAULT 1,
  support_mix_lot BOOLEAN NOT NULL DEFAULT true,
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS desk.market_gateway_destination (
 );
 
 -- ---------------------------------------------------------------------------
--- Identity-adjacent (§2.2) — Auth owns users; these are env profiles.
+-- Identity-adjacent (§2.2) - Auth owns users; these are env profiles.
 -- Defined before their dependents (office_broker, trader_profile).
 -- ---------------------------------------------------------------------------
 
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS desk.order_class (
 );
 
 CREATE TABLE IF NOT EXISTS desk.trader_profile (
- usr_id TEXT PRIMARY KEY, -- Sentin8:Auth sub — no local password
+ usr_id TEXT PRIMARY KEY, -- Sentin8:Auth sub - no local password
  env_id UUID NOT NULL,
  office_id TEXT NOT NULL REFERENCES desk.office,
  display_name TEXT NOT NULL,
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS desk.sequence (
 );
 
 -- ---------------------------------------------------------------------------
--- Router shared catalogs (data-model §2.1 — single source of truth; Router
+-- Router shared catalogs (data-model §2.1 - single source of truth; Router
 -- reads these, owns only session runtime state + the journal in its schema)
 -- ---------------------------------------------------------------------------
 
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS desk.fee_catalog (
 );
 CREATE INDEX IF NOT EXISTS idx_t8_feecat_dest ON desk.fee_catalog (env_id, destination_id);
 
--- Reject code catalog (ORDER_REJECT_MESSAGE) — Risk denials map to codes.
+-- Reject code catalog (ORDER_REJECT_MESSAGE) - Risk denials map to codes.
 CREATE TABLE IF NOT EXISTS desk.reject_code (
  env_id UUID NOT NULL,
  code TEXT NOT NULL,
@@ -369,10 +369,10 @@ CREATE TABLE IF NOT EXISTS desk.reject_code (
 -- ---------------------------------------------------------------------------
 -- ---------------------------------------------------------------------------
 -- RLS (architecture-principles.md §4.3): enable + force on all tenant
--- tables. Per-table exception handling — one bad table must not block
+-- tables. Per-table exception handling - one bad table must not block
 -- the rest (platform SQL DO-block convention).
 -- The policy-name fragment must be the *unquoted* table name (quotes are
--- re-added by %I) — embedded quotes from names like desk."order" break
+-- re-added by %I) - embedded quotes from names like desk."order" break
 -- the format string (memory: reserved-word table names are the classic
 -- DO-block failure class).
 -- ---------------------------------------------------------------------------
@@ -414,7 +414,7 @@ CREATE POLICY %1$I ON %2$s FOR DELETE USING (sentin8_context_initialized() AND e
 END $$;
 -- ---------------------------------------------------------------------------
 -- Per-service role grants + search_path (bank8-ledger pattern; the CLI
--- creates the role BEFORE this SQL — grant-before-role incident rule).
+-- creates the role BEFORE this SQL - grant-before-role incident rule).
 -- Grants live in db trade8 (this database) only; the scope→role map row
 -- is upserted by `vertical enroll` from --section=pg_roles.
 -- ---------------------------------------------------------------------------
@@ -433,7 +433,7 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------
--- Local outbox + audit journal (DBX §6.7 / §6.8 — shell-generated DDL).
+-- Local outbox + audit journal (DBX §6.7 / §6.8 - shell-generated DDL).
 -- Generated from sentin8-outbox::outbox_table_sql("desk") and
 -- sentin8-audit::audit_journal_sql("desk").
 -- ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Short-locate borrow pool — in-process Desk module over the
+//! Short-locate borrow pool - in-process Desk module over the
 //! `short_pool` / `short_pool_office_block` / `borrow_list` / `short_exempt`
 //! tables (the pool sits on the order-acceptance path; a separate process
 //! would put IPC on the hot path).
@@ -30,7 +30,7 @@ pub enum BorrowClass {
 struct PoolEntry {
     total: i64,
     available: i64,
-    /// Outstanding reservations (order ids → shares) — audit + release.
+    /// Outstanding reservations (order ids → shares) - audit + release.
     reserved: HashMap<Uuid, i64>,
 }
 
@@ -102,7 +102,7 @@ impl BorrowPool {
     }
 
     /// Available shares for a symbol from a given office (pool − office
-    /// blocks − outstanding reservations; office blocks count in full —
+    /// blocks − outstanding reservations; office blocks count in full -
     /// conservative, matching ).
     pub fn available_for(&self, symbol_id: Uuid, office_id: &str) -> i64 {
         let inner = self.inner.read();
@@ -149,7 +149,7 @@ impl BorrowPool {
         true
     }
 
-    /// Release a reservation (cancel/reject/unfill) — by share count under
+    /// Release a reservation (cancel/reject/unfill) - by share count under
     /// the simple API (the DB pass keys by order id; the arithmetic is
     /// identical).
     pub fn release(&self, symbol_id: Uuid, shares: i64) {
@@ -224,7 +224,7 @@ mod tests {
     fn release_never_exceeds_total() {
         let pool = BorrowPool::default();
         pool.set_pool(sym(6), 100);
-        pool.release(sym(6), 400); // stray release — capped at total
+        pool.release(sym(6), 400); // stray release - capped at total
         assert_eq!(pool.available(sym(6)), 100);
     }
 

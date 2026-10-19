@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Trade8:Desk service binary — order lifecycle, catalogs, borrow pool,
+//! Trade8:Desk service binary - order lifecycle, catalogs, borrow pool,
 //! session control.
 //!
 //! Design: `../desk/DESIGN.md`.
@@ -57,7 +57,7 @@ fn extend_router(app: Router<Arc<DeskState>>, _state: Arc<DeskState>) -> Router<
         .route("/v1/symbols", get(list_symbols))
         // Borrow pool CRUD (locate-approval actions).
         .route("/v1/borrow", get(borrow_read).post(borrow_mutate))
-        // WS order entry — the two-way tier.
+        // WS order entry - the two-way tier.
         .route("/ws", get(ws_entry))
         // Func proxy-back host functions.
         .route("/v1/internal/func-host/orders", post(func_host_submit))
@@ -68,7 +68,7 @@ fn extend_router(app: Router<Arc<DeskState>>, _state: Arc<DeskState>) -> Router<
         )
         // Admin RFW pages: page definitions + POST-alias data endpoints.
         .route("/v1/admin/ui/{*page}", get(admin_ui::get_admin_ui))
-        // ── Shield policy-admin API (platform policy design — shared
+        // ── Shield policy-admin API (platform policy design - shared
         // implementation; handlers generic over this state via HasPolicyAdmin).
         .route(
             "/v1/admin/policy-sets",
@@ -127,7 +127,7 @@ fn extend_router(app: Router<Arc<DeskState>>, _state: Arc<DeskState>) -> Router<
             "/v1/health",
             // Carries the binary's build identity (`version`/`build`,
             // BUILDID-1) so captain's monitor populates `make status`'s
-            // VERSION column — the consuming BINARY's identity.
+            // VERSION column - the consuming BINARY's identity.
             get(|| async { Json(serde_json::json!({"status": "ok", "service": "trade8:desk", "version": sentin8::build_info::id(), "build": sentin8::build_info::build_hash()})) }),
         )
 }
@@ -208,7 +208,7 @@ pub(crate) async fn submit_order(
                 .await
                 .map_err(sentin8::shell::err_db)?;
             sentin8::shell::set_tenant_context(&mut conn, env).await;
-            // RLS context is transaction-local (DESIGN.md §5) —
+            // RLS context is transaction-local (DESIGN.md §5) -
             // begin() pins the tenant context to the SAME tx as the DML/reads.
             let mut tx = match conn.begin().await {
                 Ok(t) => t,
@@ -232,7 +232,7 @@ pub(crate) async fn submit_order(
         }
         Ok(verdict) => {
             // Risk deny: map the code, journal the rejection with the
-            // full verdict trace (auditable deny — desk §4.2 step 3).
+            // full verdict trace (auditable deny - desk §4.2 step 3).
             let code = RejectCode::from_wire(&verdict.reject_code.clone().unwrap_or_default())
                 .unwrap_or(RejectCode::RiskTraderDisabled);
             let rej = Rejection::new(code).with_params(serde_json::json!({"trace": verdict.trace}));
@@ -244,7 +244,7 @@ pub(crate) async fn submit_order(
                 .await
                 .map_err(sentin8::shell::err_db)?;
             sentin8::shell::set_tenant_context(&mut conn, env).await;
-            // RLS context is transaction-local (DESIGN.md §5) —
+            // RLS context is transaction-local (DESIGN.md §5) -
             // begin() pins the tenant context to the SAME tx as the DML/reads.
             let mut tx = match conn.begin().await {
                 Ok(t) => t,
@@ -279,7 +279,7 @@ async fn submit_rejected(
     office: &str,
     rej: Rejection,
 ) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
-    // the context is transaction-local — set it INSIDE an
+    // the context is transaction-local - set it INSIDE an
     // explicit tx with the DML, never on a bare connection.
     let mut conn = match st.core.pool.acquire().await {
         Ok(c) => c,
@@ -313,7 +313,7 @@ async fn submit_rejected(
 )]
 
 /// Basket submission: per-item validation + accept/reject, one
-/// batch event. Each accepted item persists independently — a failing
+/// batch event. Each accepted item persists independently - a failing
 /// item rejects only itself. Every item passes the Risk gate.
 pub(crate) async fn submit_batch(
     State(st): State<Arc<DeskState>>,
@@ -344,7 +344,7 @@ pub(crate) async fn submit_batch(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -469,7 +469,7 @@ pub(crate) async fn list_orders(
         }
     };
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -519,7 +519,7 @@ pub(crate) async fn get_order(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -577,7 +577,7 @@ pub(crate) async fn cancel_order(
                 .await
                 .map_err(sentin8::shell::err_db)?;
             sentin8::shell::set_tenant_context(&mut conn, env).await;
-            // RLS context is transaction-local (DESIGN.md §5) —
+            // RLS context is transaction-local (DESIGN.md §5) -
             // begin() pins the tenant context to the SAME tx as the DML/reads.
             let mut tx = match conn.begin().await {
                 Ok(t) => t,
@@ -644,7 +644,7 @@ pub(crate) async fn replace_order(
                 .await
                 .map_err(sentin8::shell::err_db)?;
             sentin8::shell::set_tenant_context(&mut conn, env).await;
-            // RLS context is transaction-local (DESIGN.md §5) —
+            // RLS context is transaction-local (DESIGN.md §5) -
             // begin() pins the tenant context to the SAME tx as the DML/reads.
             let mut tx = match conn.begin().await {
                 Ok(t) => t,
@@ -692,7 +692,7 @@ pub(crate) async fn flatten(
     )
     .await?;
     let env = auth.env_id();
-    // the typed strategy parameters ride the flatten event — the
+    // the typed strategy parameters ride the flatten event - the
     // Func strategy module (flexible-flat) consumes them for the resubmit
     // loop; the Desk performs the synchronous cancel side now.
     let strategy = serde_json::to_value(&req.strategy).unwrap_or_default();
@@ -704,7 +704,7 @@ pub(crate) async fn flatten(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -769,7 +769,7 @@ pub(crate) async fn session_state(
 
 /// Session action (Cron proxy-back + manual ops). Transitions persist a
 /// `session:state` outbox event; the close transition sweeps day orders
-/// (cancel) and parks overnight ones — engine + DB in the same handler
+/// (cancel) and parks overnight ones - engine + DB in the same handler
 /// (session FSM); preopen restores parked orders from the DB.
 pub(crate) async fn session_action(
     State(st): State<Arc<DeskState>>,
@@ -777,7 +777,7 @@ pub(crate) async fn session_action(
     Json(body): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
-    // trade8:cron:run — the Cron proxy-back M2M. Step 5 — Shield
+    // trade8:cron:run - the Cron proxy-back M2M. Step 5 - Shield
     // decides on the session-manage action.
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -797,7 +797,7 @@ pub(crate) async fn session_action(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -1019,7 +1019,7 @@ pub(crate) async fn borrow_mutate(
         .await
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, env).await;
-    // RLS context is transaction-local (DESIGN.md §5) —
+    // RLS context is transaction-local (DESIGN.md §5) -
     // begin() pins the tenant context to the SAME tx as the DML/reads.
     let mut tx = match conn.begin().await {
         Ok(t) => t,
@@ -1048,7 +1048,7 @@ pub(crate) async fn borrow_mutate(
     tag = "desk",
 )]
 
-/// WS order entry — the bidirectional tier. Same authorization
+/// WS order entry - the bidirectional tier. Same authorization
 /// (Bearer on the upgrade request) + same submit path as REST; the
 /// client replays `idempotency_key` in `client_order_id` so resubmits
 /// are deduped by the engine (replay-safe).
@@ -1057,7 +1057,7 @@ pub(crate) async fn ws_entry(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
 ) -> Result<axum::response::Response, (axum::http::StatusCode, String)> {
-    // Authorization at upgrade time — no anonymous sockets.
+    // Authorization at upgrade time - no anonymous sockets.
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -1142,7 +1142,7 @@ async fn ws_loop(mut socket: WebSocket, st: Arc<DeskState>) {
     tag = "desk-internal",
 )]
 
-/// Func proxy-back — `POST /v1/internal/func-host/orders`:
+/// Func proxy-back - `POST /v1/internal/func-host/orders`:
 /// submit on behalf of a strategy module (attribution via
 /// `on_behalf_of`; the acting user is the strategy's owner).
 pub(crate) async fn func_host_submit(
@@ -1184,7 +1184,7 @@ pub(crate) async fn func_host_submit(
     tag = "desk-internal",
 )]
 
-/// Func proxy-back — `GET /v1/internal/func-host/orders/{id}`.
+/// Func proxy-back - `GET /v1/internal/func-host/orders/{id}`.
 pub(crate) async fn func_host_get(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
@@ -1215,7 +1215,7 @@ pub(crate) async fn func_host_get(
     tag = "desk",
 )]
 
-/// Func proxy-back — `POST /v1/internal/func-host/orders/{id}/cancel`.
+/// Func proxy-back - `POST /v1/internal/func-host/orders/{id}/cancel`.
 pub(crate) async fn func_host_cancel(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
@@ -1304,7 +1304,7 @@ impl sentin8::shield::admin::HasPolicyAdmin for DeskState {
 
 // ---------------------------------------------------------------------------
 // Handler tests (test-architecture design §7). The 8-step pipeline over
-// the REAL router: verify (1–4) against a LOCAL JWKS stand-in (one
+// the REAL router: verify (1-4) against a LOCAL JWKS stand-in (one
 // ephemeral listener; SigningKeys::generate_for_testing both serves the
 // JWKS doc and mints the tokens), Shield gate (5) from the real
 // scope-mirror seed, RLS context (6+) on db trade8 via the service role
@@ -1312,7 +1312,7 @@ impl sentin8::shield::admin::HasPolicyAdmin for DeskState {
 // ---------------------------------------------------------------------------
 // The in-file `handler_tests` module below exercises handler flows against
 // an ephemeral OIDC stand-in. It references `sentin8_auth::jwks` /
-// `sentin8_auth::jwt` — the Auth SERVER crate — which this repo never
+// `sentin8_auth::jwt` - the Auth SERVER crate - which this repo never
 // declared as a dependency (no vertical pins the auth server; imports go
 // through the platform SDK facade, which does not re-export jwks). The
 // harness therefore never compiled as-is. Disabled pending the SDK-side
@@ -1455,7 +1455,7 @@ mod handler_tests {
             .ok()?;
         let policy_engine = sentin8::shield::runtime::engine_for("trade8:desk");
         // Boot from the local substrate (vertical init seeded it); a fresh
-        // DB boots the deny-default engine — the 403 legs still assert.
+        // DB boots the deny-default engine - the 403 legs still assert.
         let _ =
             sentin8::shield::runtime::boot_full(&pool, &h.issuer, "trade8:desk", &policy_engine)
                 .await;
@@ -1512,7 +1512,7 @@ mod handler_tests {
         let (status, _) = oneshot(&app, "GET", "/v1/orders", None, None).await;
         assert_eq!(status, StatusCode::UNAUTHORIZED);
         // Malformed token: not a JWT-shaped value; the verify step rejects
-        // 401 — unless a platform dev-credential fallback exists (the dev
+        // 401 - unless a platform dev-credential fallback exists (the dev
         // static token path); both 401 and 403 prove rejection here.
         let (status, _) = oneshot(&app, "GET", "/v1/orders", Some("garbage"), None).await;
         assert!(
@@ -1571,7 +1571,7 @@ mod handler_tests {
         let (status, body) = oneshot(&app, "GET", "/v1/orders", Some(&t), None).await;
         assert_eq!(status, StatusCode::OK, "read allowed with the read scope");
         assert!(body.is_object(), "blotter body is a JSON object");
-        // A scope-mismatched call — the rejection body shape contract:
+        // A scope-mismatched call - the rejection body shape contract:
         let t_ns = h.mint("scopeless", env_a(), &[], 300);
         let (status_ns, body_ns) = oneshot(&app, "GET", "/v1/orders", Some(&t_ns), None).await;
         assert_eq!(status_ns, StatusCode::FORBIDDEN, "no scope → 403");
@@ -1616,7 +1616,7 @@ mod handler_tests {
             StatusCode::FORBIDDEN,
             "read-scope submit → 403: {body}"
         );
-        // With the write scope the request proceeds — an unknown
+        // With the write scope the request proceeds - an unknown
         // destination/session still yields a STRUCTURED rejection (the
         // validation pipeline runs after the gate); never a panic/500-unless-DB.
         let t_rw = h.mint(
@@ -1640,7 +1640,7 @@ mod handler_tests {
         .await;
         // In-memory engine: unknown destination → engine rejection
         // (structured 4xx), empty catalog symbol-unknown, or DB-offline
-        // persist failure → 5xx logged-but-accepted — accept all three;
+        // persist failure → 5xx logged-but-accepted - accept all three;
         // the pipeline (not a panic) produced the verdict.
         assert_ne!(status2, StatusCode::UNAUTHORIZED, "valid token accepted");
         assert_ne!(
@@ -1695,7 +1695,7 @@ mod handler_tests {
     }
 
     /// The admin POST-alias session action shares the GET route's
-    /// handler — the session-manage scope must pass, a scopeless admin
+    /// handler - the session-manage scope must pass, a scopeless admin
     /// token → 403 (the alias inherits the gate, not a separate policy).
     #[tokio::test]
     async fn admin_session_post_alias_scope_gated() {
@@ -1746,7 +1746,7 @@ mod handler_tests {
 
     /// The admin read endpoint (`/v1/admin/orders`) is RLS-scoped:
     /// with the read scope it returns an envelope (empty list on a fresh
-    /// env), never a 403 — and without a scope → 403.
+    /// env), never a 403 - and without a scope → 403.
     #[tokio::test]
     async fn admin_orders_read_env_scoped() {
         let h = Harness::spawn().await;

@@ -109,7 +109,7 @@
         "tags": [
           "trade8-admin"
         ],
-        "summary": "`GET /v1/admin/borrow` — short pool + category + exempt rows.",
+        "summary": "`GET /v1/admin/borrow` - short pool + category + exempt rows.",
         "operationId": "admin_borrow",
         "responses": {
           "200": {
@@ -213,7 +213,7 @@
         "tags": [
           "trade8-admin"
         ],
-        "summary": "`GET /v1/admin/orders` — env-wide order rows (admin scope).",
+        "summary": "`GET /v1/admin/orders` - env-wide order rows (admin scope).",
         "operationId": "admin_orders",
         "responses": {
           "200": {
@@ -239,7 +239,7 @@
         "tags": [
           "trade8-admin"
         ],
-        "summary": "`GET /v1/admin/overview` — session + counts card.",
+        "summary": "`GET /v1/admin/overview` - session + counts card.",
         "operationId": "admin_overview",
         "responses": {
           "200": {
@@ -715,7 +715,7 @@
         "tags": [
           "trade8-admin"
         ],
-        "summary": "`POST /v1/admin/session` — RFW POST-alias for the session action\n(the renderer can't issue raw POST bodies to /v1/session ops).",
+        "summary": "`POST /v1/admin/session` - RFW POST-alias for the session action\n(the renderer can't issue raw POST bodies to /v1/session ops).",
         "operationId": "admin_session_action",
         "responses": {
           "200": {
@@ -767,7 +767,7 @@
         "tags": [
           "trade8-admin"
         ],
-        "summary": "`GET /v1/admin/ui/{page}` — the RFW definitions.",
+        "summary": "`GET /v1/admin/ui/{page}` - the RFW definitions.",
         "operationId": "get_admin_ui",
         "responses": {
           "200": {
@@ -863,7 +863,7 @@
         "tags": [
           "desk-internal"
         ],
-        "summary": "Func proxy-back — `POST /v1/internal/func-host/orders`:\nsubmit on behalf of a strategy module (attribution via\n`on_behalf_of`; the acting user is the strategy's owner).",
+        "summary": "Func proxy-back - `POST /v1/internal/func-host/orders`:\nsubmit on behalf of a strategy module (attribution via\n`on_behalf_of`; the acting user is the strategy's owner).",
         "operationId": "func_host_submit",
         "responses": {
           "200": {
@@ -889,7 +889,7 @@
         "tags": [
           "desk-internal"
         ],
-        "summary": "Func proxy-back — `GET /v1/internal/func-host/orders/{id}`.",
+        "summary": "Func proxy-back - `GET /v1/internal/func-host/orders/{id}`.",
         "operationId": "func_host_get",
         "responses": {
           "200": {
@@ -915,7 +915,7 @@
         "tags": [
           "desk"
         ],
-        "summary": "Func proxy-back — `POST /v1/internal/func-host/orders/{id}/cancel`.",
+        "summary": "Func proxy-back - `POST /v1/internal/func-host/orders/{id}/cancel`.",
         "operationId": "func_host_cancel",
         "responses": {
           "200": {
@@ -991,7 +991,7 @@
         "tags": [
           "desk"
         ],
-        "summary": "Basket submission: per-item validation + accept/reject, one\nbatch event. Each accepted item persists independently — a failing\nitem rejects only itself. Every item passes the Risk gate.",
+        "summary": "Basket submission: per-item validation + accept/reject, one\nbatch event. Each accepted item persists independently - a failing\nitem rejects only itself. Every item passes the Risk gate.",
         "operationId": "submit_batch",
         "responses": {
           "200": {
@@ -1138,7 +1138,7 @@
         "tags": [
           "desk"
         ],
-        "summary": "Session action (Cron proxy-back + manual ops). Transitions persist a\n`session:state` outbox event; the close transition sweeps day orders\n(cancel) and parks overnight ones — engine + DB in the same handler\n(session FSM); preopen restores parked orders from the DB.",
+        "summary": "Session action (Cron proxy-back + manual ops). Transitions persist a\n`session:state` outbox event; the close transition sweeps day orders\n(cancel) and parks overnight ones - engine + DB in the same handler\n(session FSM); preopen restores parked orders from the DB.",
         "operationId": "session_action",
         "responses": {
           "200": {
@@ -1189,7 +1189,7 @@
         "tags": [
           "desk"
         ],
-        "summary": "WS order entry — the bidirectional tier. Same authorization\n(Bearer on the upgrade request) + same submit path as REST; the\nclient replays `idempotency_key` in `client_order_id` so resubmits\nare deduped by the engine (replay-safe).",
+        "summary": "WS order entry - the bidirectional tier. Same authorization\n(Bearer on the upgrade request) + same submit path as REST; the\nclient replays `idempotency_key` in `client_order_id` so resubmits\nare deduped by the engine (replay-safe).",
         "operationId": "ws_entry",
         "responses": {
           "200": {
@@ -1216,7 +1216,7 @@
   "tags": [
     {
       "name": "desk",
-      "description": "Trade8:Desk — order management"
+      "description": "Trade8:Desk - order management"
     },
     {
       "name": "trade8-admin",

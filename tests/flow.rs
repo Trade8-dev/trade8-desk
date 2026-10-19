@@ -7,7 +7,7 @@
 //! two-phase submit path end-to-end with a Risk test double.
 //!
 //! TREE-LAYOUT-ONLY: the risk double embeds the REAL risk engine via a
-//! `#[path = "../../risk/src/core.rs"]` include — a cross-repo path that
+//! `#[path = "../../risk/src/core.rs"]` include - a cross-repo path that
 //! resolves ONLY in the aggregation-tree layout (both repos checked out
 //! side by side). Single-repo checkouts (CI) cannot resolve it; the
 //! include is feature-gated so the tree operator runs these flows with
@@ -17,10 +17,10 @@
 //!
 //! Phases exercised in one running engine (the REAL desk + risk code, not
 //! mocks):
-//!   1. **Phase 1 (park)** — `DeskEngine::submit_pending` parks the order
+//!   1. **Phase 1 (park)** - `DeskEngine::submit_pending` parks the order
 //!      (`Pending`); structural validation (symbol/destination/qty/price)
 //!      rejects before Risk is ever called.
-//!   2. **Phase 2 (authorize)** — Risk's REAL `RiskEngine::authorize`
+//!   2. **Phase 2 (authorize)** - Risk's REAL `RiskEngine::authorize`
 //!      (embedded via `#[path]`; the exact production check pipeline)
 //!      answers the wire-shaped `AuthorizeRequest`:
 //!        - allow leg (buying-power limit bound, trace asserted),
@@ -30,15 +30,15 @@
 //!          outage contract never trades unguarded... actually the
 //!          not-enrolled branch structurally allows; the outage branch is
 //!          exercised at the wiring layer below).
-//!   3. **Persist (allow)** — `persist_order_accepted` one-tx write
+//!   3. **Persist (allow)** - `persist_order_accepted` one-tx write
 //!      (order + event + `desk.outbox` row) via the SAME pattern the
 //!      handler runs; the outbox payload carries the FULL order snapshot
 //!      (payload-completeness, VDC-3) with every payload key Router's
 //!      consumer (`route_accepted_order`) reads: `order_id`, `market_id`,
 //!      `office_id`, `client_order_id`, `symbol_name`, `side`, `qty.raw`,
 //!      `price.raw`/`price.scale`.
-//!   4. **Persist (deny)** — the rejection journal row
-//!      (`trade8:desk:order:rejected` outbox event, trace attached) — the
+//!   4. **Persist (deny)** - the rejection journal row
+//!      (`trade8:desk:order:rejected` outbox event, trace attached) - the
 //!      auditable-deny contract.
 //!
 //! Runs against the live platform PostgreSQL (db `trade8`) as the REAL
@@ -46,7 +46,7 @@
 //! unreachable (the sql_matrix pattern). The certificate-presenting mTLS
 //! hop itself (https-only mTLS) is covered by Sentin8:TLS and the
 //! certificate-identity integration
-//! suites on the platform side (test-architecture §6 — the direct-call
+//! suites on the platform side (test-architecture §6 - the direct-call
 //! seam is what this file's wire-shaped `AuthorizeRequest` doubles).
 
 #[path = "../src/borrow.rs"]
@@ -85,7 +85,7 @@ fn env_a() -> Uuid {
     Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap()
 }
 
-/// ONE connection per test — tenant context is connection-local
+/// ONE connection per test - tenant context is connection-local
 /// (architecture-principles §4.3d). `None` → skip (hermetic offline).
 async fn desk_conn() -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
     let pool = PgPoolOptions::new()
@@ -157,7 +157,7 @@ fn new_req(
 }
 
 /// The wire-shaped `AuthorizeRequest` Desk's wiring builds for a pending
-/// order (mirrors `DeskWiring::authorize_order`'s field mapping — kept in
+/// order (mirrors `DeskWiring::authorize_order`'s field mapping - kept in
 /// sync by the wiring-level allow assertion below).
 fn authorize_req(o: &Order, mark_raw: Option<i128>) -> AuthorizeRequest {
     AuthorizeRequest {
@@ -195,7 +195,7 @@ fn authorize_req(o: &Order, mark_raw: Option<i128>) -> AuthorizeRequest {
 }
 
 /// Seed the desk FK referents for a persisted order (same statements as
-/// the sql_matrix `seed_referents` — symbol/destination/office/trader).
+/// the sql_matrix `seed_referents` - symbol/destination/office/trader).
 async fn seed_referents(
     conn: &mut sqlx::PgConnection,
     env: Uuid,
@@ -403,7 +403,7 @@ fn risk_double_allow_with_buying_power_trace() {
     assert!(bp_check.passed);
     assert_eq!(v.remaining_buying_power, Some(1_000_000_000 - 10_050_000));
     assert_eq!(v.trader_state, trade8::contracts::TraderState::Active);
-    // The order is still parked — authorize does NOT mutate desk state
+    // The order is still parked - authorize does NOT mutate desk state
     // (open_order_count counts Accepted+; a Pending park is not yet working).
     assert_eq!(e.open_order_count("u-flow"), 0);
     let parked = e.order_by_id(o.order_id).unwrap();
@@ -477,7 +477,7 @@ fn risk_double_denies_buying_power() {
 }
 
 /// Wiring branches: Risk unenrolled (`risk = None`) structurally allows
-/// (the engine's structural checks already ran — desk design §4.2); Risk
+/// (the engine's structural checks already ran - desk design §4.2); Risk
 /// unreachable (an erroring double) fails CLOSED with the
 /// `trade8_risk_trader_disabled` unavailable rejection (outage contract).
 #[tokio::test]
@@ -495,13 +495,13 @@ async fn wiring_none_allows_and_outage_fails_closed() {
 }
 
 // ---------------------------------------------------------------------------
-// The DB legs (live db trade8; skip offline) — the full two-phase flow
+// The DB legs (live db trade8; skip offline) - the full two-phase flow
 // ---------------------------------------------------------------------------
 
 /// The FULL allow flow: park → Risk authorize (double) → accept → persist
 /// (order + event + outbox, one tx) → the outbox payload carries every key
 /// Router's `route_accepted_order` consumer reads (payload-completeness,
-/// VDC-3) — the cross-service contract that makes `trade8:router` able to
+/// VDC-3) - the cross-service contract that makes `trade8:router` able to
 /// run from the event payload alone.
 #[tokio::test]
 async fn flow_allow_park_authorize_accept_persist_route_contract() {
@@ -514,7 +514,7 @@ async fn flow_allow_park_authorize_accept_persist_route_contract() {
     let e = seated_engine(&sym, &dest);
     let client = format!("flow-a-{}", Uuid::now_v7().simple());
 
-    // Phase 1 — park (structural validation passed).
+    // Phase 1 - park (structural validation passed).
     let pending = e
         .submit_pending(
             "u-flow",
@@ -530,7 +530,7 @@ async fn flow_allow_park_authorize_accept_persist_route_contract() {
         .unwrap();
     assert_eq!(pending.state, OrderState::Pending);
 
-    // Phase 2 — Risk authorize (the REAL engine on the wire-shaped req).
+    // Phase 2 - Risk authorize (the REAL engine on the wire-shaped req).
     let d = RiskDouble::with_limits(vec![risk_double::limit(1_000_000_000)]);
     let verdict = d.engine.authorize(&authorize_req(&pending, None));
     assert!(
@@ -570,7 +570,7 @@ async fn flow_allow_park_authorize_accept_persist_route_contract() {
 
     // The routed contract: the ORDER_ACCEPTED outbox payload carries every
     // key Router's `route_accepted_order` reads (payload-completeness,
-    // VDC-3) — a consumer must run from the payload alone.
+    // VDC-3) - a consumer must run from the payload alone.
     let (family, payload): (String, serde_json::Value) = sqlx::query_as(
         r#"SELECT stream_family, payload FROM desk.outbox
            WHERE env_id = $1 AND event_type = $2 AND payload->>'order_id' = $3
@@ -663,7 +663,7 @@ async fn flow_deny_park_authorize_reject_journal() {
                 "order_id": o.order_id,
                 "rejection": trade8::contracts::Rejection::new(
                     trade8::contracts::RejectCode::RiskTraderDisabled),
-                // The real deny branch attaches the FULL verdict trace —
+                // The real deny branch attaches the FULL verdict trace -
                 // here one CheckResult matching the trader-state deny.
                 "trace": serde_json::json!([{
                     "check": "trader_state", "passed": false,

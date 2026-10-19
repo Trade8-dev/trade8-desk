@@ -77,7 +77,7 @@ crate::openapi::w::desk_health,
     components(schemas()),
     security(),
     tags(
-        (name = "desk", description = "Trade8:Desk — order management"),
+        (name = "desk", description = "Trade8:Desk - order management"),
         (name = "trade8-admin", description = "Trade8 admin surface (RFW)"),
         (name = "policy", description = "Shield policy administration (shared surface)"),
     ),

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Session clock — the env session state machine driven by
+//! Session clock - the env session state machine driven by
 //! Sentin8:Cron proxy-back (preopen/open/close-pending/closed).
 //!
 //! Design: `../desk/DESIGN.md` §4.5.
@@ -17,7 +17,7 @@ const OPEN: u8 = 1;
 const CLOSE_PENDING: u8 = 2;
 const CLOSED: u8 = 3;
 
-/// Atomic session state — hot-path reads are a single load.
+/// Atomic session state - hot-path reads are a single load.
 #[derive(Default)]
 pub struct SessionClock {
     state: AtomicU8,

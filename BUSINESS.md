@@ -1,4 +1,4 @@
-# Trade8:Desk — Business Requirements & Functionality
+# Trade8:Desk - Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > Trade8:Desk **does for the business**. For architecture read `README.md`;
@@ -75,7 +75,7 @@
 |---|---|
 | `trade8:desk:order:submitted` | A structurally valid order is parked for authorization |
 | `trade8:desk:order:accepted` | Risk allows and the order is persisted |
-| `trade8:desk:order:rejected` | Deny (risk or structural) — includes the reject code and trace |
+| `trade8:desk:order:rejected` | Deny (risk or structural) - includes the reject code and trace |
 | `trade8:desk:order:cancelled` | User/manager/session/close/risk cancellation |
 | `trade8:desk:order:replaced` | A cancel-replace chains a new order |
 | `trade8:desk:order:flatten` | A flatten instruction is requested (strategy trigger) |
@@ -95,9 +95,9 @@ state stays in Desk.
 1. No order is ever accepted without a synchronous allow verdict from Trade8:Risk.
 2. Every order-state change is journaled with actor and reason; the ledger is
    immutable and complete for the trading day.
-3. Resubmitted client order ids are idempotent — one order per client order id.
+3. Resubmitted client order ids are idempotent - one order per client order id.
 4. Short sells reserve locate availability before acceptance and release it on
-   terminal states — availability never goes negative.
+   terminal states - availability never goes negative.
 5. Close parks overnight orders and cancels day remnants; preopen restores
    parked orders exactly as parked.
 6. The blotter shows only orders the trader is entitled to see (own / office /
@@ -166,7 +166,7 @@ state stays in Desk.
   is unused today)?
 - Does the business need per-reservation borrow events for downstream
   systems, or is the summary event sufficient?
-- Office-manager cross-environment flatten (supervising multiple desks) —
+- Office-manager cross-environment flatten (supervising multiple desks) -
   product decision pending.
 - Catalog replication across offices/environments: one owner catalog per
   environment vs a centrally-owned, event-replicated catalog.

@@ -6,7 +6,7 @@
 //! Trade8:Desk SQL integration tests (test-architecture-design §5.1).
 //!
 //! Runs against the live platform PostgreSQL (18) as the **real service
-//! role** `trade8_desk_service` (NOBYPASSRLS — what the service uses once
+//! role** `trade8_desk_service` (NOBYPASSRLS - what the service uses once
 //! per-service DSNs are enabled) plus `trade8_probe` for the no-context
 //! RLS leg. Covers the store-layer contract unit tests cannot exercise:
 //!   1. no tenant context → 0 rows (silent RLS enforcement)
@@ -15,14 +15,14 @@
 //!      ONE explicit transaction (outbox-first, architecture-principles §6.7)
 //!   4. overnight park → load → restore round-trip through the DB
 //!
-//! Context is transaction-local (`set_config(..., true)`) — every test
+//! Context is transaction-local (`set_config(..., true)`) - every test
 //! sets context inside a `conn.begin()` transaction and runs all
 //! statements on that same tx (DESIGN.md §5, architecture-principles
 //! §4.3d). Skips silently when the DB is unreachable so `cargo test`
 //! stays hermetic offline (exchange8 `sql_matrix.rs` pattern).
 //!
 //! The desk crate is a binary (no lib target), so its modules are pulled
-//! in via `#[path]` — the same pattern as bank8's payments tests.
+//! in via `#[path]` - the same pattern as bank8's payments tests.
 
 #[path = "../src/borrow.rs"]
 #[allow(dead_code)]
@@ -62,7 +62,7 @@ fn env_b() -> Uuid {
     Uuid::parse_str("22222222-2222-2222-2222-222222222222").unwrap()
 }
 
-/// ONE connection per test — tenant context is connection-local;
+/// ONE connection per test - tenant context is connection-local;
 /// context-set and data queries must ride the same connection
 /// (architecture-principles.md §4.3d). `None` → skip (hermetic offline).
 async fn desk_conn() -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
@@ -113,7 +113,7 @@ fn catalog_fixture() -> (SymbolRow, DestinationRow) {
 }
 
 /// An engine-shaped `Order` in the Accepted state (the shape
-/// `submit_with_actor` returns — persisted via `persist_order_accepted`).
+/// `submit_with_actor` returns - persisted via `persist_order_accepted`).
 fn accepted_order(client_order_id: &str, sym: &SymbolRow, dest: &DestinationRow) -> Order {
     static RUN: std::sync::OnceLock<Uuid> = std::sync::OnceLock::new();
     let run = *RUN.get_or_init(Uuid::now_v7);
@@ -134,7 +134,7 @@ fn accepted_order(client_order_id: &str, sym: &SymbolRow, dest: &DestinationRow)
         order_type: OrderType::Limit,
         tif: TimeInForce::Day,
         qty,
-        price: Some(Price::equity(100_500)), // 10.05 ×10⁴ — scale pinned in tests
+        price: Some(Price::equity(100_500)), // 10.05 ×10⁴ - scale pinned in tests
         stop_price: None,
         state: OrderState::Accepted,
         leaves_qty: qty,
@@ -214,7 +214,7 @@ async fn cleanup_order(conn: &mut sqlx::PgConnection, env: Uuid, o: &Order) {
 
 /// The FK chain behind `desk."order"`: office → trader_profile, and
 /// market → symbol (+ destination). Seeded per test (fresh UUIDs),
-/// removed in cleanup. (The live DB enforces FKs — the engine-only
+/// removed in cleanup. (The live DB enforces FKs - the engine-only
 /// fixtures never needed the referents; this is exactly what the
 /// sql_matrix is for.)
 async fn seed_referents(
@@ -310,7 +310,7 @@ async fn seed_referents(
 }
 
 /// A throwaway destination row for helpers that only need the symbol
-/// referent (borrow seeding) — never persisted.
+/// referent (borrow seeding) - never persisted.
 fn dest_placeholder() -> DestinationRow {
     DestinationRow {
         destination_id: Uuid::new_v4(),
@@ -408,7 +408,7 @@ async fn rls_matrix_cross_env_returns_zero() {
 // ---------------------------------------------------------------------------
 
 /// One `persist_order_accepted` call → order row (×10⁴ price), event row
-/// (pending→accepted), outbox event row (`stream_family='desk'`) — all
+/// (pending→accepted), outbox event row (`stream_family='desk'`) - all
 /// three from one explicit transaction.
 #[tokio::test]
 async fn persist_order_accepted_triple_write() {
@@ -429,7 +429,7 @@ async fn persist_order_accepted_triple_write() {
     }
     let mut tx = conn.begin().await.unwrap();
     sentin8::shell::set_tenant_context(&mut tx, env_a()).await;
-    // Order row — the ×10⁴ price scale is pinned (design §6).
+    // Order row - the ×10⁴ price scale is pinned (design §6).
     let (state, price_px, qty, leaves): (String, Option<i64>, i64, i64) = sqlx::query_as(
         r#"SELECT state, price_px, qty, leaves_qty FROM desk."order"
            WHERE order_id = $1 AND env_id = $2"#,
@@ -457,7 +457,7 @@ async fn persist_order_accepted_triple_write() {
     assert_eq!(actor, "u1");
     assert_eq!(reason.as_deref(), Some("submit"));
     // Inbox row: desk stream family + event type + full-order payload
-    // (payload-completeness — a trigger must run from the payload alone).
+    // (payload-completeness - a trigger must run from the payload alone).
     let (family, payload): (String, serde_json::Value) = sqlx::query_as(
         r#"SELECT stream_family, payload FROM desk.outbox
            WHERE env_id = $1 AND event_type = $2
@@ -482,7 +482,7 @@ async fn persist_order_accepted_triple_write() {
 }
 
 /// `persist_transition` (cancel): order row updated + journal appended +
-/// outbox event row — all in one tx.
+/// outbox event row - all in one tx.
 #[tokio::test]
 async fn persist_transition_updates_and_journals() {
     let Some(mut conn) = desk_conn().await else {
@@ -794,7 +794,7 @@ async fn catalog_bootstrap_loads_engine() {
     // Seed the tick-rule bands under env-a.
     let mut tx = conn.begin().await.unwrap();
     sentin8::shell::set_tenant_context(&mut tx, env_a()).await;
-    // Tick bands JSONB [{price_lt, tick_size}] — parsed by the loader.
+    // Tick bands JSONB [{price_lt, tick_size}] - parsed by the loader.
     sqlx::query(
         r#"INSERT INTO desk.tick_rule (tick_rule_id, env_id, description, bands)
            VALUES ($1,$2,'sqltest-' || $1::text,'[{"price_lt":1000000000,"tick_size":100}]'::jsonb)
@@ -807,9 +807,9 @@ async fn catalog_bootstrap_loads_engine() {
     .unwrap();
     tx.commit().await.unwrap();
 
-    // Bootstrap → engine populated. The loaders set tenant context —
+    // Bootstrap → engine populated. The loaders set tenant context -
     // transaction-local, so they MUST run inside a tx to see seeded rows
-    // (design §8b — the autocommit call-site bug this suite documents).
+    // (design §8b - the autocommit call-site bug this suite documents).
     let engine = DeskEngine::new();
     {
         let mut tx = conn.begin().await.unwrap();
@@ -882,7 +882,7 @@ async fn borrow_bootstrap_and_mutation() {
 
     let engine = DeskEngine::new();
     {
-        // Context is transaction-local — run the loader inside a tx (§8b).
+        // Context is transaction-local - run the loader inside a tx (§8b).
         let mut tx = conn.begin().await.unwrap();
         store::bootstrap_borrow(&mut tx, env_a(), &engine)
             .await

@@ -1,4 +1,4 @@
-# Trade8:Desk — Detailed Design Document
+# Trade8:Desk - Detailed Design Document
 
 > Audience: maintainers, reviewers, and architects modifying the service.
 > Overview in `README.md`; business functionality in `BUSINESS.md`.
@@ -87,7 +87,7 @@ graph TD
     end
 ```
 
-### Request lifecycle — order submit (the authoritative family)
+### Request lifecycle - order submit (the authoritative family)
 
 ```mermaid
 sequenceDiagram
@@ -137,7 +137,7 @@ sequenceDiagram
     end
     D-->>C: per-item statuses (per-item not all-or-none)
     C->>D: POST /v1/positions/flatten (FlattenRequest, strategy params)
-    D->>DB: emit trade8:desk:order:flatten (outbox) — trigger: Sentin8:Func flexible-flat via vertical-registry event_triggers
+    D->>DB: emit trade8:desk:order:flatten (outbox) - trigger: Sentin8:Func flexible-flat via vertical-registry event_triggers
     C->>D: POST /v1/session {action: open|close|close_pending|preopen}
     D->>DB: session FSM event + outbox(trade8:desk:session:state)
     alt action = close
@@ -212,7 +212,7 @@ erDiagram
   avg volume; `future` adds expiry/settle/price_scale.
 - `destination` holds protocol (`fix42|fix44|ouch31`), `credentials_ref`
   (secret **reference**, never plaintext), visibility (`B|D|H`), heartbeat,
-  seq-reset policy — router reads it via declared cross-schema grants.
+  seq-reset policy - router reads it via declared cross-schema grants.
 - `trader_profile` is keyed by the Auth user id (`usr_id PK = sentin8 sub`).
 - `sequence` holds env-wide counter conventions for lease-style allocation.
 
@@ -224,13 +224,13 @@ erDiagram
 |---|---|---|---|
 | `POST /v1/orders` | Submit order (idempotency required) | `trade8:desk:order:write` | `trade8:desk:order:submitted`, `::accepted`, `::rejected` |
 | `POST /v1/orders/batch` | Basket submission (per-item risk) | `trade8:desk:order:write` | per-item `::submitted/accepted/rejected` |
-| `GET /v1/orders` | Blotter (scope-filtered) | `trade8:desk:order:read` | — |
-| `GET /v1/orders/{id}` | Order detail | `trade8:desk:order:read` | — |
+| `GET /v1/orders` | Blotter (scope-filtered) | `trade8:desk:order:read` | - |
+| `GET /v1/orders/{id}` | Order detail | `trade8:desk:order:read` | - |
 | `DELETE /v1/orders/{id}` | Cancel | `trade8:desk:order:cancel` | `::cancelled` |
 | `POST /v1/orders/{id}/replace` | Cancel-replace (new order id) | `trade8:desk:order:write` | `::cancelled` (old), `::submitted/accepted` (new) |
 | `POST /v1/positions/flatten` | One-click flatten | `trade8:desk:order:flatten` | `::flatten` (Func trigger), then normal submit flow |
 | `GET /v1/session` · `POST /v1/session` | Session state / action | `trade8:market:session:manage` | `trade8:desk:session:state` |
-| `GET /v1/symbols` | Instrument catalog | `trade8:desk:order:read` | — |
+| `GET /v1/symbols` | Instrument catalog | `trade8:desk:order:read` | - |
 | `GET /v1/borrow` · `POST /v1/borrow` | Locate pool read/mutation | `trade8:risk:borrow:read` / `trade8:risk:borrow:write` | `trade8:desk:borrow:updated` |
 | `GET /ws` | Two-way order entry channel (upgrade) | `trade8:desk:order:write` | same as REST path |
 
@@ -244,14 +244,14 @@ erDiagram
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /v1/internal/func-host/orders` | `submit_order(on behalf of trader)` — flexible-flat/basket-runner |
-| `POST /v1/internal/func-host/orders/{id}/cancel` | `cancel_order(on behalf)` — flexible-flat attempt loop |
+| `POST /v1/internal/func-host/orders` | `submit_order(on behalf of trader)` - flexible-flat/basket-runner |
+| `POST /v1/internal/func-host/orders/{id}/cancel` | `cancel_order(on behalf)` - flexible-flat attempt loop |
 | `GET /v1/internal/func-host/orders/{id}` | order snapshot for strategy hooks |
 
 Gates: `trade8:func:host` + the M2M workload's declared scopes; every mutation
 journals an actor of the form `strategy:{module}`.
 
-### Admin (RFW renderer — `GET /v1/admin/ui/{page}` + data endpoints)
+### Admin (RFW renderer - `GET /v1/admin/ui/{page}` + data endpoints)
 
 | Page | Data endpoint(s) |
 |---|---|
@@ -293,25 +293,25 @@ sequenceDiagram
 
 ## 5. Cross-Cutting Concerns
 
-- **Authentication & authorization** — platform 8-step pipeline: `verify_token`
+- **Authentication & authorization** - platform 8-step pipeline: `verify_token`
   (issuer/expiry/audience/type) → tenant resolution → feature gate → Shield
   (`sentin8-policy`) live-role decision (`trade8:desk:*` + ReBAC + ABAC
   attributes) → RLS context → handler → audit. No `scope`-only checks.
-- **Tenant resolution + RLS** — `set_tenant_context(&mut conn, env)` then
+- **Tenant resolution + RLS** - `set_tenant_context(&mut conn, env)` then
   `conn.begin()`; data SQL runs on the *same* transaction (context is
   transaction-local). Every store query filters `env_id` explicitly as
   defense-in-depth. RLS `ENABLE`+`FORCE` on all tables; role
   `trade8_desk_service` has no BYPASSRLS.
-- **Idempotency** — `client_order_id`/idempotency-key dedupe at submit;
+- **Idempotency** - `client_order_id`/idempotency-key dedupe at submit;
   bus events carry idempotency keys (outbox row id); consumers dedupe.
-- **Audit journaling** — `desk.audit_journal` rows in the same tx as domain
+- **Audit journaling** - `desk.audit_journal` rows in the same tx as domain
   changes; pushed to Sys ingest (`POST /v1/audit`, `sentin8:sys:audit:write`)
-  with retries — a Sys outage never drops audit.
-- **Rate limiting / bot protection** — delegated to the BFF edge + Shield
+  with retries - a Sys outage never drops audit.
+- **Rate limiting / bot protection** - delegated to the BFF edge + Shield
   ABAC attributes (e.g. max-orders rate limits enforced in Risk domain logic).
-- **Graceful drain** — shell `upgrade-instance` drains in-flight requests
+- **Graceful drain** - shell `upgrade-instance` drains in-flight requests
   before swap (platform contract); no Desk-specific drain state.
-- **TLS posture** — post-quantum TLS everywhere via `sentin8-tls` (X25519MLKEM768,
+- **TLS posture** - post-quantum TLS everywhere via `sentin8-tls` (X25519MLKEM768,
   ML-DSA-65); service M2M is certificate-bound; no classical fallback.
 
 ## 6. Failure Modes & Recovery
@@ -327,7 +327,7 @@ sequenceDiagram
   at-least-once after recovery. Downstream consumers dedupe on idempotency keys.
 - **Consumer failure on an accepted order event** → Nack → redelivery; after
   retry exhaustion the event lands in the bus DLQ (`GET /v1/dlq`) for manual
-  replay — order state in Desk remains correct because the journal is local.
+  replay - order state in Desk remains correct because the journal is local.
 - **Process crash** → journal is durable; session rebuild replays
   `desk.order_event` for working-state recovery; parked `desk.overnight_order`
   restores at session preopen.
@@ -368,16 +368,16 @@ graph LR
     ENG --> FEED[Trade8:Feed]
 ```
 
-- **Task layout** — one axum server task set + the shell's relay/audit tasks;
+- **Task layout** - one axum server task set + the shell's relay/audit tasks;
   no bespoke background loops (session timers are Cron, not in-process).
-- **Locking** — the engine's working map is guarded by a std mutex held across
+- **Locking** - the engine's working map is guarded by a std mutex held across
   pure in-memory operations only (no `.await` under lock, no I/O under lock);
   catalog reads are snapshot-based, no lock on hot reads.
-- **Pool** — `max_connections` capped at 3 × instances via the shared helper;
+- **Pool** - `max_connections` capped at 3 × instances via the shared helper;
   every store call is tx-scoped, so a request holds ≤1 connection.
-- **Hot paths** — submit (validate → authorize → 1 tx), cancel, WS order
+- **Hot paths** - submit (validate → authorize → 1 tx), cancel, WS order
   entry; blotter paging reads the DB with a bounded `limit`.
-- **Backpressure** — WS frames and bus-consumer dispatch use bounded queues
+- **Backpressure** - WS frames and bus-consumer dispatch use bounded queues
   (`OutboundStream`/`QueueFull` in `trade8-client`) so slow clients cannot
   stall the engine.
 
@@ -390,7 +390,7 @@ graph LR
    releases it.
 4. Tenant context is set per request and pinned to the same tx as the data; a
    request without a resolvable env context is rejected, never defaulted.
-5. `credentials_ref` (destination secrets) is stored by reference only —
+5. `credentials_ref` (destination secrets) is stored by reference only -
    plaintext provider credentials are never inserted by Desk.
 6. No `unsafe` blocks in the service. The engine's `OrderState::can_transition`
    table is the sole authority for transitions.
@@ -399,9 +399,9 @@ graph LR
 
 ```mermaid
 graph TD
-    U["Unit: engine state machine, borrow math, catalog parsing — in-file #[cfg test]"] --> I[Integration: tests/sql_matrix.rs — real DB, service role + trade8_probe]
-    I --> P[Policy: tests/policy.rs — Shield engine vs declared policy seed]
-    I --> E2E[E2E: e2e-ts UI via BFF proxy — submit → blotter → cancel]
+    U["Unit: engine state machine, borrow math, catalog parsing - in-file #[cfg test]"] --> I[Integration: tests/sql_matrix.rs - real DB, service role + trade8_probe]
+    I --> P[Policy: tests/policy.rs - Shield engine vs declared policy seed]
+    I --> E2E[E2E: e2e-ts UI via BFF proxy - submit → blotter → cancel]
     P --> L[Latency harness: submit/cancel P50 budget in-file]
 ```
 
@@ -418,7 +418,7 @@ graph TD
   the cross-service flow tests with the Risk test double
   (`src/risk_double.rs`). The double embeds Risk's REAL engine core
   (`trade8-risk/src/core.rs`) via `include!` inside a feature-gated inline
-  `mod` — the include path is opaque to rustfmt (single-repo CI's blocking
+  `mod` - the include path is opaque to rustfmt (single-repo CI's blocking
   fmt gate stays green) and resolves only when the feature is on, which
   requires the aggregation-tree layout (trade8-risk checked out side by
   side). A single-repo `cargo test` runs 0 tests from this target.
@@ -435,7 +435,7 @@ graph TD
 - Whether flatten attempt loops should always run through Cron-scheduled timers
   (vs the current bounded in-process ladder) at higher order volumes.
 - `trade8:desk:order:batch-requested` is declared as an event trigger in
-  `vertical-registry.json` but Desk submits batches synchronously today — the
+  `vertical-registry.json` but Desk submits batches synchronously today - the
   async batch-trigger contract is a candidate for either full removal or full
   adoption (no in-between), pending product decision.
 

@@ -3,16 +3,16 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Desk runtime wiring  — the Risk authorize call on
+//! Desk runtime wiring  - the Risk authorize call on
 //! the accept path, the Feed BBO snapshot read (flatten pricing), and the
 //! Sentin8:Func proxy-back host functions.
 //!
 //! The Risk call is the ONLY synchronous inter-service hop on the hot
 //! path (master design §5.2): Desk POSTs `AuthorizeRequest` to
 //! `POST {risk}/v1/authorize` over Sentin8:TLS, presenting its own
-//! workload certificate in the TLS handshake (CERTFREE-4V — scope
+//! workload certificate in the TLS handshake (CERTFREE-4V - scope
 //! `trade8:risk:authorize` is authorized by the registry map). Fail-open
-//! vs fail-closed is a one-line policy: this path is **fail-closed** — a
+//! vs fail-closed is a one-line policy: this path is **fail-closed** - a
 //! Risk outage rejects with `RiskUnavailable` rather than trading
 //! unguarded.
 
@@ -28,7 +28,7 @@ use crate::engine::DeskEngine;
 /// The Risk caller + Feed reader held in Desk state.
 #[derive(Clone)]
 pub struct DeskWiring {
-    /// Risk authorize caller (None in local dev — no Risk enrolled;
+    /// Risk authorize caller (None in local dev - no Risk enrolled;
     /// submits then self-authorize structurally only).
     pub risk: Option<trade8::client::SharedCaller>,
     /// Feed BBO reader (None → no marks; flatten uses order prices).
@@ -84,7 +84,7 @@ impl DeskWiring {
                 None,
             ));
         };
-        // Mark context from Feed ( read path; missing mark is fine —
+        // Mark context from Feed ( read path; missing mark is fine -
         // Risk falls back to price).
         let mark_raw = self.bbo_mark(&order.symbol_name).await;
         let req = AuthorizeRequest {
@@ -128,7 +128,7 @@ impl DeskWiring {
             Err(e) => {
                 // Fail-closed (design §4.2): a Risk outage must never
                 // trade unguarded. 503-shaped rejection.
-                tracing::warn!(error = %e, "desk: risk authorize call failed — fail closed");
+                tracing::warn!(error = %e, "desk: risk authorize call failed - fail closed");
                 Err(Rejection::new(RejectCode::RiskTraderDisabled)
                     .with_params(serde_json::json!({"unavailable": true})))
             }
@@ -161,7 +161,7 @@ impl DeskWiring {
     }
 }
 
-/// Trader state observed locally (the local-allow path only — the real
+/// Trader state observed locally (the local-allow path only - the real
 /// verdict carries Risk's own observation).
 fn order_side_state(_order: &Order) -> trade8::contracts::TraderState {
     trade8::contracts::TraderState::Active
@@ -173,7 +173,7 @@ fn order_side_state(_order: &Order) -> trade8::contracts::TraderState {
 /// - `get_order` GET /v1/internal/func-host/orders/{id}
 /// - `submit_order` POST /v1/internal/func-host/orders
 /// - `cancel_order` POST /v1/internal/func-host/orders/{id}/cancel
-///   Func's own workload identity only — verified by the Func
+///   Func's own workload identity only - verified by the Func
 ///   proxy-back gate.
 pub mod func_host {
     use super::*;

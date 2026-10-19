@@ -23,7 +23,7 @@ use uuid::Uuid;
 use crate::catalog::{DestinationRow, SymbolRow, SymbolRowRaw, TickBand};
 use crate::engine::DeskEngine;
 
-/// Wire/DB encoding helpers — the serde renames are the stored values
+/// Wire/DB encoding helpers - the serde renames are the stored values
 /// (enums.rs keeps the codes byte-true).
 fn side_str(s: Side) -> String {
     serde_json::to_value(s)
@@ -86,11 +86,11 @@ fn tif_from(s: &str) -> TimeInForce {
 // ---------------------------------------------------------------------------
 // Bootstrap: load reference tables into the catalog snapshot.
 // Runs at startup on a fresh connection with the service's own env id
-// (boot context — the M2M token's env; runs once before serving).
+// (boot context - the M2M token's env; runs once before serving).
 // ---------------------------------------------------------------------------
 
 /// Load catalogs for one env into the engine's arc-swap snapshot.
-/// Failure is logged, not fatal — the service still serves health and
+/// Failure is logged, not fatal - the service still serves health and
 /// admin (a reload event can repair the cache later).
 pub async fn bootstrap_catalog(conn: &mut PgConnection, env_id: Uuid, engine: &DeskEngine) {
     if let Err(e) = bootstrap_catalog_inner(conn, env_id, engine).await {
@@ -181,7 +181,7 @@ async fn bootstrap_catalog_inner(
 // ---------------------------------------------------------------------------
 
 /// Persist a newly accepted order: INSERT order row, INSERT order_event,
-/// INSERT outbox event row (`trade8:desk:order:accepted`) — same tx.
+/// INSERT outbox event row (`trade8:desk:order:accepted`) - same tx.
 pub async fn persist_order_accepted(
     conn: &mut PgConnection,
     env_id: Uuid,
@@ -211,7 +211,7 @@ pub async fn persist_order_accepted(
 }
 
 /// Persist a state transition (cancel/replace/park/restore): UPDATE order,
-/// INSERT event, INSERT outbox — same tx.
+/// INSERT event, INSERT outbox - same tx.
 pub async fn persist_transition(
     conn: &mut PgConnection,
     env_id: Uuid,
@@ -320,11 +320,11 @@ pub async fn insert_event_row(
     Ok(())
 }
 
-/// Append a desk event to the local outbox (`desk.outbox`) — same tx as
+/// Append a desk event to the local outbox (`desk.outbox`) - same tx as
 /// the domain change (outbox-first, architecture-principles §6.7). The
 /// shell's boot-step-8b relay drains it to Bus `POST /v1/produce` (M2M,
 /// `sentin8:bus:produce`, idempotency key = the outbox row id); a Bus
-/// outage leaves the row unrelayed and retries — never silently dropped.
+/// outage leaves the row unrelayed and retries - never silently dropped.
 pub async fn insert_outbox_event(
     conn: &mut PgConnection,
     env_id: Uuid,
@@ -440,7 +440,7 @@ pub async fn persist_restored(
 // ---------------------------------------------------------------------------
 
 /// Load the borrow pool from the reference tables into the engine.
-/// Short-locate is on the accept hot path — the pool must be resident.
+/// Short-locate is on the accept hot path - the pool must be resident.
 pub async fn bootstrap_borrow(
     conn: &mut PgConnection,
     env_id: Uuid,
@@ -505,7 +505,7 @@ pub struct BorrowMutation {
 }
 
 /// Apply one borrow mutation: DB write + engine swap + `borrow:updated`
-/// outbox event — same tx.
+/// outbox event - same tx.
 pub async fn persist_borrow_mutation(
     conn: &mut PgConnection,
     env_id: Uuid,
@@ -657,7 +657,7 @@ fn row_to_summary(r: OrderReadRow) -> OrderSummary {
 }
 
 /// DB blotter: own rows (self scope) or office rows (manager scope).
-/// Explicit `WHERE env_id = $1 AND (usr_id = $2 OR office_id = $3)` —
+/// Explicit `WHERE env_id = $1 AND (usr_id = $2 OR office_id = $3)` -
 /// defense-in-depth on top of RLS.
 pub async fn blotter_rows(
     conn: &mut PgConnection,
@@ -687,7 +687,7 @@ pub async fn blotter_rows(
     Ok(rows.into_iter().map(row_to_summary).collect())
 }
 
-/// Full order read row (detail + replay) — an explicit struct because the
+/// Full order read row (detail + replay) - an explicit struct because the
 /// 22-column shape exceeds sqlx's tuple FromRow limit (16).
 #[derive(sqlx::FromRow)]
 struct OrderFullRow {

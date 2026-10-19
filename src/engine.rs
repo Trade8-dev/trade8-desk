@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Trade8:Desk
 // SPDX-License-Identifier: Apache-2.0
 
-//! Desk engine — the order state machine core.
+//! Desk engine - the order state machine core.
 //!
 //! Single-writer per order id: submit/cancel/replace/flatten transition the
 //! working map and append to the event journal; this module owns the pure
@@ -28,10 +28,10 @@ use crate::catalog::Catalog;
 use crate::session::SessionClock;
 
 /// The engine's durable state (in-memory working set; DB mirror lands with
-/// the tokio pass — event journal shape is fixed here).
+/// the tokio pass - event journal shape is fixed here).
 #[derive(Default)]
 pub struct DeskEngineInner {
-    /// Working orders by id — the session read path.
+    /// Working orders by id - the session read path.
     pub orders: HashMap<Uuid, Order>,
     /// Append-only journal (seq per env in the DB form).
     pub events: Vec<(Uuid, OrderState, OrderState, String, String)>,
@@ -149,7 +149,7 @@ impl DeskEngine {
 
     /// The two-phase submit for the Risk-gated path: structural
     /// validation (identical to `submit_with_actor`) builds a **Pending**
-    /// order parked in the working map, WITHOUT the accept transition —
+    /// order parked in the working map, WITHOUT the accept transition -
     /// the caller then invokes Risk `authorize` and calls
     /// [`Self::accept_pending`] or [`Self::reject_pending`].
     ///
@@ -310,7 +310,7 @@ impl DeskEngine {
         Ok(rejected)
     }
 
-    /// Cancel a working order (user or manager — scope enforced upstream).
+    /// Cancel a working order (user or manager - scope enforced upstream).
     pub fn cancel_with_actor(&self, actor: &str, order_id: Uuid) -> Result<Order, Rejection> {
         let mut inner = self.inner.write();
         let Some(order) = inner.orders.get_mut(&order_id) else {
@@ -472,7 +472,7 @@ impl DeskEngine {
                     "session_close_park".into(),
                 ));
             } else {
-                // day/gtc remnants cancel at close (day) or leave (gtc —
+                // day/gtc remnants cancel at close (day) or leave (gtc -
                 // venue semantics; the Desk cancels day only)
                 if o.tif.sweeps_at_close() {
                     o.state = OrderState::Cancelled;
@@ -518,7 +518,7 @@ impl DeskEngine {
         n
     }
 
-    /// Restore one parked order with a NEW chained order id ( —
+    /// Restore one parked order with a NEW chained order id ( -
     /// "parked orders → pending at preopen, chain new order ids").
     /// The parked row stays (audit), the new pending order carries
     /// `replaces_order_id = parked_id`. Works for both the in-memory
@@ -556,7 +556,7 @@ impl DeskEngine {
         restored
     }
 
-    /// Blotter read (self scope: own rows only — explicit WHERE parity in
+    /// Blotter read (self scope: own rows only - explicit WHERE parity in
     /// the DB pass; here the in-memory filter).
     pub fn blotter_for(&self, usr_id: &str, office_id: &str) -> Vec<OrderSummary> {
         self.inner
@@ -609,7 +609,7 @@ impl DeskEngine {
             .count()
     }
 
-    /// Desk-side position view for one (trader, symbol) — signed net of
+    /// Desk-side position view for one (trader, symbol) - signed net of
     /// filled quantities (buys positive). The Pnl service owns the
     /// authoritative position ledger; this is the order-flow view Risk
     /// sees on the authorize path when no Pnl mirror has landed yet.
@@ -632,7 +632,7 @@ impl DeskEngine {
         self.session.state()
     }
 
-    /// Session action (main.rs handler) — Cron parity actions.
+    /// Session action (main.rs handler) - Cron parity actions.
     /// Returns the resulting state; unknown actions leave state unchanged.
     pub async fn session_action(&self, action: &str) -> SessionState {
         if let Some(next) = SessionState::parse(action) {
@@ -659,7 +659,7 @@ impl DeskEngine {
         self.session.state()
     }
 
-    /// Blotter (main.rs handler — self scope).
+    /// Blotter (main.rs handler - self scope).
     pub async fn blotter(&self, auth: &AuthContext) -> Vec<OrderSummary> {
         let office = self
             .catalog
@@ -680,7 +680,7 @@ impl DeskEngine {
         }
     }
 
-    /// Symbols read (main.rs handler — catalog cache).
+    /// Symbols read (main.rs handler - catalog cache).
     pub fn symbols_json(&self) -> Vec<serde_json::Value> {
         self.catalog.symbols_json()
     }
@@ -735,7 +735,7 @@ impl DeskEngine {
         self.replace_with_actor(&auth.claims.sub, id, req)
     }
 
-    /// Flatten: cancel all working orders for the target scope ( —
+    /// Flatten: cancel all working orders for the target scope ( -
     /// the resubmit strategy loop is a Func module concern; the Desk
     /// performs the cancel side synchronously).
     pub async fn flatten(&self, auth: &AuthContext, req: FlattenRequest) -> usize {
@@ -922,7 +922,7 @@ mod tests {
     }
 
     /// A dedicated engine for tests that MUTATE exclusive state (session
-    /// clock, order chains) — the shared engine's u1 order set and session
+    /// clock, order chains) - the shared engine's u1 order set and session
     /// clock are mutated by parallel tests (memory: no shared mutable test
     /// state). Same fixture shape as `shared_engine`.
     fn test_engine() -> DeskEngine {
@@ -956,7 +956,7 @@ mod tests {
 
     #[test]
     fn session_gate_blocks_submit() {
-        // Dedicated engine — mutating the shared engine's session clock
+        // Dedicated engine - mutating the shared engine's session clock
         // races with parallel tests (memory: no shared mutable test state).
         let e = test_engine();
         e.session.set(SessionState::Closed);
@@ -972,7 +972,7 @@ mod tests {
 
     #[test]
     fn cancel_and_replace_chain() {
-        // Dedicated engine — the shared engine's tests mutate u1's orders
+        // Dedicated engine - the shared engine's tests mutate u1's orders
         // concurrently (a parallel sweep cancelling this test's order is
         // the "not cancellable" race test_engine's doc explains).
         let e = test_engine();
@@ -1045,9 +1045,9 @@ mod tests {
         assert!(rows.iter().all(|r| r.usr_id == "u2"));
     }
 
-    ///  — the exhaustive transition matrix property: for every
+    ///  - the exhaustive transition matrix property: for every
     /// (from, action) pair the engine either performs the transition or
-    /// rejects with the mapped code — never a silent no-op and never an
+    /// rejects with the mapped code - never a silent no-op and never an
     /// illegal state landing. Terminal states reject every mutation;
     /// working states accept cancel; replace chains only from working.
     #[test]
@@ -1113,7 +1113,7 @@ mod tests {
                 assert!(res.is_err(), "replace from {from:?} must reject");
             }
         }
-        // Property: terminal states never resurrect — every action on a
+        // Property: terminal states never resurrect - every action on a
         // terminal order leaves it terminal (state map unchanged).
         for t in terminal {
             let e = engine_with_state(t);

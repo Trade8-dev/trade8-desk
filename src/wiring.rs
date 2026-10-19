@@ -179,7 +179,7 @@ pub mod func_host {
     use super::*;
 
     /// One host-function request (Func → Desk proxy-back).
-    #[derive(Debug, serde::Deserialize)]
+    #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
     pub struct HostSubmit {
         pub usr_id: String,
         pub on_behalf_of: Option<String>,

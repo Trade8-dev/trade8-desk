@@ -8,6 +8,8 @@
 //! policy-admin surface (`sentin8::shell::policy_*` wrappers). See
 //! `sentin8/design/sentin8-openapi-coverage-design.md` §2.
 
+use crate::store;
+use crate::wiring;
 use utoipa::OpenApi;
 
 pub mod w {
@@ -18,7 +20,7 @@ pub mod w {
         get,
         path = "/v1/health",
         responses(
-            (status = 200, description = "Service is healthy", body = serde_json::Value),
+            (status = 200, description = "Service is healthy", body = crate::HealthInfo),
         ),
         security(),
         tag = "desk",
@@ -74,7 +76,28 @@ crate::openapi::w::desk_health,
         sentin8::shell::policy_put_attribute,
         sentin8::shell::policy_delete_attribute,
     ),
-    components(schemas()),
+    components(schemas(
+        crate::HealthInfo,
+        crate::SubmitOrderResponse,
+        crate::BatchResponse,
+        crate::MutationAck,
+        crate::ReplaceAck,
+        crate::FlattenAck,
+        crate::SessionStateResponse,
+        crate::SessionActionRequest,
+        crate::SymbolsResponse,
+        crate::BorrowPool,
+        crate::BorrowMutationAck,
+        crate::HostSubmitResponse,
+        trade8::contracts::Order,
+        trade8::contracts::OrderSummary,
+        trade8::contracts::NewOrderRequest,
+        trade8::contracts::ReplaceOrderRequest,
+        trade8::contracts::FlattenRequest,
+        store::BorrowMutation,
+        wiring::func_host::HostSubmit,
+        sentin8::rfw::AdminUiResponse,
+    )),
     security(),
     tags(
         (name = "desk", description = "Trade8:Desk - order management"),

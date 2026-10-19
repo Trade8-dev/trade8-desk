@@ -495,7 +495,7 @@ pub async fn bootstrap_borrow(
 }
 
 /// Borrow CRUD row (admin + risk actions).
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct BorrowMutation {
     pub symbol_id: Uuid,
     pub total_shares: Option<i64>,

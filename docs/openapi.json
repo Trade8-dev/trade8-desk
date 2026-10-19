@@ -23,7 +23,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {}
+                  "items": {
+                    "$ref": "#/components/schemas/PrincipalAttr"
+                  }
                 }
               }
             }
@@ -46,17 +48,21 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PutAttributeBody"
+              }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Attribute stored",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeUpserted"
+                }
               }
             }
           },
@@ -113,10 +119,13 @@
         "operationId": "admin_borrow",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -139,10 +148,13 @@
         "operationId": "admin_destinations",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -165,10 +177,13 @@
         "operationId": "admin_markets",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -191,10 +206,13 @@
         "operationId": "admin_offices",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -217,10 +235,13 @@
         "operationId": "admin_orders",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -243,10 +264,13 @@
         "operationId": "admin_overview",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -273,7 +297,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {}
+                  "items": {
+                    "$ref": "#/components/schemas/PolicySetRow"
+                  }
                 }
               }
             }
@@ -298,7 +324,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PolicyModeBody"
+              }
             }
           },
           "required": true
@@ -327,7 +355,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PolicyModeBody"
+              }
             }
           },
           "required": true
@@ -356,7 +386,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PolicyModeBody"
+              }
             }
           },
           "required": true
@@ -398,7 +430,9 @@
             "description": "The policy set",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PolicySetDetail"
+                }
               }
             }
           },
@@ -434,17 +468,21 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PutPolicySetBody"
+              }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Policy set stored",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PolicySetMutated"
+                }
               }
             }
           },
@@ -512,7 +550,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/TestPolicySetBody"
+              }
             }
           },
           "required": true
@@ -522,7 +562,9 @@
             "description": "Dry-run decision trace",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyTestOutcome"
+                }
               }
             }
           },
@@ -550,7 +592,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {}
+                  "items": {
+                    "$ref": "#/components/schemas/RelationRecordRow"
+                  }
                 }
               }
             }
@@ -573,7 +617,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {}
+              "schema": {
+                "$ref": "#/components/schemas/PutRelationBody"
+              }
             }
           },
           "required": true
@@ -583,7 +629,9 @@
             "description": "Relation stored",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationUpserted"
+                }
               }
             }
           },
@@ -671,7 +719,9 @@
             "description": "The check verdict",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationCheckResult"
+                }
               }
             }
           },
@@ -695,10 +745,13 @@
         "operationId": "admin_session",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -719,10 +772,12 @@
         "operationId": "admin_session_action",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Session state",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStateResponse"
+                }
               }
             }
           },
@@ -745,10 +800,13 @@
         "operationId": "admin_symbols",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Admin rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
               }
             }
           },
@@ -774,7 +832,9 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUiResponse"
+                }
               }
             }
           },
@@ -797,10 +857,12 @@
         "operationId": "borrow_read",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Borrow pool",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BorrowPool"
+                }
               }
             }
           },
@@ -821,10 +883,12 @@
         "operationId": "borrow_mutate",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Borrow mutated",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BorrowMutationAck"
+                }
               }
             }
           },
@@ -850,7 +914,9 @@
             "description": "Service is healthy",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/HealthInfo"
+                }
               }
             }
           }
@@ -867,10 +933,12 @@
         "operationId": "func_host_submit",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Func-host submit",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/HostSubmitResponse"
+                }
               }
             }
           },
@@ -893,10 +961,12 @@
         "operationId": "func_host_get",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Func-host order",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
               }
             }
           },
@@ -919,10 +989,12 @@
         "operationId": "func_host_cancel",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Func-host cancel",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MutationAck"
+                }
               }
             }
           },
@@ -945,10 +1017,15 @@
         "operationId": "list_orders",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Order list (blotter)",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderSummary"
+                  }
+                }
               }
             }
           },
@@ -969,10 +1046,12 @@
         "operationId": "submit_order",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Order accepted/parked/duplicate echo",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitOrderResponse"
+                }
               }
             }
           },
@@ -995,10 +1074,12 @@
         "operationId": "submit_batch",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Batch accept/reject rows",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
               }
             }
           },
@@ -1020,10 +1101,12 @@
         "operationId": "get_order",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Order detail",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
               }
             }
           },
@@ -1043,10 +1126,12 @@
         "operationId": "cancel_order",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Cancelled",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MutationAck"
+                }
               }
             }
           },
@@ -1068,10 +1153,12 @@
         "operationId": "replace_order",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Replaced",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReplaceAck"
+                }
               }
             }
           },
@@ -1093,10 +1180,12 @@
         "operationId": "flatten",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Flatten orders submitted",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/FlattenAck"
+                }
               }
             }
           },
@@ -1118,10 +1207,12 @@
         "operationId": "session_state",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Session state",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStateResponse"
+                }
               }
             }
           },
@@ -1142,10 +1233,12 @@
         "operationId": "session_action",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Session action",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStateResponse"
+                }
               }
             }
           },
@@ -1167,10 +1260,12 @@
         "operationId": "list_symbols",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Tradable symbols",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SymbolsResponse"
+                }
               }
             }
           },
@@ -1192,13 +1287,8 @@
         "summary": "WS order entry - the bidirectional tier. Same authorization\n(Bearer on the upgrade request) + same submit path as REST; the\nclient replays `idempotency_key` in `client_order_id` so resubmits\nare deduped by the engine (replay-safe).",
         "operationId": "ws_entry",
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
+          "101": {
+            "description": "Protocol upgraded (binary FIX/OUCH framing)"
           },
           "401": {
             "description": "Not authenticated"
@@ -1211,7 +1301,2445 @@
       }
     }
   },
-  "components": {},
+  "components": {
+    "schemas": {
+      "AdminUiAction": {
+        "type": "object",
+        "description": "An action button shown in the page header.",
+        "required": [
+          "label",
+          "action_type"
+        ],
+        "properties": {
+          "action_type": {
+            "$ref": "#/components/schemas/AdminUiActionType",
+            "description": "The action kind (link / submit / dialog)."
+          },
+          "endpoint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Endpoint to POST to (for submit actions)."
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Material Icons code point (hex string) for the button."
+          },
+          "label": {
+            "type": "string",
+            "description": "Button label."
+          },
+          "route": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Route to navigate to (for link actions)."
+          }
+        }
+      },
+      "AdminUiActionType": {
+        "type": "string",
+        "description": "The kind of a header action button.",
+        "enum": [
+          "link",
+          "submit",
+          "dialog"
+        ]
+      },
+      "AdminUiPage": {
+        "type": "object",
+        "description": "A complete admin UI page definition returned by `GET /v1/admin/ui/{page}`.",
+        "required": [
+          "title",
+          "widgets"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminUiAction"
+            },
+            "description": "Optional actions shown in the page header (buttons)."
+          },
+          "title": {
+            "type": "string",
+            "description": "The page title (shown in breadcrumb and header)."
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoteWidget"
+            },
+            "description": "The root widget tree."
+          }
+        }
+      },
+      "AdminUiResponse": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Render this page definition.",
+            "required": [
+              "page",
+              "response_type"
+            ],
+            "properties": {
+              "page": {
+                "$ref": "#/components/schemas/AdminUiPage",
+                "description": "The page definition to render."
+              },
+              "response_type": {
+                "type": "string",
+                "enum": [
+                  "page"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Redirect to this route (e.g. after a successful form submission).",
+            "required": [
+              "route",
+              "response_type"
+            ],
+            "properties": {
+              "response_type": {
+                "type": "string",
+                "enum": [
+                  "redirect"
+                ]
+              },
+              "route": {
+                "type": "string",
+                "description": "The route to navigate to."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "An error occurred (validation error, server error, etc.).",
+            "required": [
+              "message",
+              "response_type"
+            ],
+            "properties": {
+              "field_errors": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FieldError"
+                },
+                "description": "Per-field validation errors, when applicable."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message."
+              },
+              "response_type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              }
+            }
+          }
+        ],
+        "description": "The response from an admin UI endpoint.\n\n- `GET /v1/admin/ui/{page}` → `AdminUiResponse::Page(page_def)`\n- `POST /v1/admin/{resource}` → `AdminUiResponse::Page(updated_page_def)` or `AdminUiResponse::Redirect(route)`"
+      },
+      "AttributeUpserted": {
+        "type": "object",
+        "description": "An attribute upsert result.",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Always `upserted`."
+          }
+        }
+      },
+      "BatchResponse": {
+        "type": "object",
+        "description": "Batch submit result.",
+        "required": [
+          "accepted",
+          "rejected"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "array",
+            "items": {},
+            "description": "Per-order accept rows (`order_id`, `state`, optional `duplicate`)."
+          },
+          "rejected": {
+            "type": "array",
+            "items": {},
+            "description": "Client-order-id + rejection rows."
+          }
+        }
+      },
+      "BorrowMutation": {
+        "type": "object",
+        "description": "Borrow CRUD row (admin + risk actions).",
+        "required": [
+          "symbol_id"
+        ],
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exempt": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "office_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "symbol_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "total_shares": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "BorrowMutationAck": {
+        "type": "object",
+        "description": "Borrow mutation acknowledgement (symbol-scoped, order-id fields unused).",
+        "required": [
+          "symbol_id",
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Always `ok` (else the request errors)."
+          },
+          "symbol_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The affected symbol id."
+          }
+        }
+      },
+      "BorrowPool": {
+        "type": "object",
+        "description": "Borrow pool envelope.",
+        "required": [
+          "pool"
+        ],
+        "properties": {
+          "pool": {
+            "type": "array",
+            "items": {},
+            "description": "Per-symbol availability rows."
+          }
+        }
+      },
+      "ButtonType": {
+        "type": "string",
+        "description": "Button visual style.",
+        "enum": [
+          "primary",
+          "secondary",
+          "danger",
+          "ghost",
+          "link"
+        ]
+      },
+      "ChartType": {
+        "type": "string",
+        "description": "Chart kind.",
+        "enum": [
+          "bar",
+          "line",
+          "pie"
+        ]
+      },
+      "ContainerDirection": {
+        "type": "string",
+        "description": "Layout direction for a container's children.",
+        "enum": [
+          "vertical",
+          "horizontal"
+        ]
+      },
+      "Decision": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "decision"
+            ],
+            "properties": {
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "allow"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "reason",
+              "decision"
+            ],
+            "properties": {
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "deny"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "DestinationVisibility": {
+        "type": "string",
+        "description": "Destination visibility`).",
+        "enum": [
+          "b",
+          "d",
+          "h"
+        ]
+      },
+      "FieldCondition": {
+        "type": "object",
+        "description": "A visibility condition for a form field.",
+        "required": [
+          "field",
+          "equals"
+        ],
+        "properties": {
+          "equals": {
+            "description": "The value that must match for this field to be visible."
+          },
+          "field": {
+            "type": "string",
+            "description": "The key of the field whose value to check."
+          }
+        }
+      },
+      "FieldError": {
+        "type": "object",
+        "description": "A per-field validation error.",
+        "required": [
+          "field",
+          "message"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "The form field key the error refers to."
+          },
+          "message": {
+            "type": "string",
+            "description": "The validation message shown under the field."
+          }
+        }
+      },
+      "FlattenAck": {
+        "type": "object",
+        "description": "Flatten acknowledgement.",
+        "required": [
+          "flatten_orders_submitted"
+        ],
+        "properties": {
+          "flatten_orders_submitted": {
+            "type": "integer",
+            "description": "Flatten orders submitted to the blotter.",
+            "minimum": 0
+          }
+        }
+      },
+      "FlattenRequest": {
+        "type": "object",
+        "description": "Flatten instruction (desk design §5.1; ).",
+        "required": [
+          "strategy"
+        ],
+        "properties": {
+          "office_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "strategy": {
+            "$ref": "#/components/schemas/FlattenStrategy",
+            "description": "Strategy params (typed )."
+          },
+          "symbol_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Flatten only this symbol when set."
+          },
+          "usr_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Trader to flatten (self by default; office scope needs manager scope)."
+          }
+        }
+      },
+      "FlattenStrategy": {
+        "type": "object",
+        "required": [
+          "attempts",
+          "hold_time_ms",
+          "cancel_after_ms",
+          "priority",
+          "price_adjust",
+          "offset_ticks",
+          "visibility"
+        ],
+        "properties": {
+          "attempts": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "cancel_after_ms": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Cancel working orders older than this before re-attempting (ms).",
+            "minimum": 0
+          },
+          "hold_time_ms": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Hold time between attempts (ms).",
+            "minimum": 0
+          },
+          "offset_ticks": {
+            "type": "integer",
+            "format": "int32",
+            "description": " Ticks away from reference when price_adjust = offset_ticks\n."
+          },
+          "price_adjust": {
+            "type": "string",
+            "description": "`market`, `mid`, or `offset_ticks`."
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/DestinationVisibility"
+          }
+        }
+      },
+      "FormFieldOption": {
+        "type": "object",
+        "description": "One choice of a select-type form field.",
+        "required": [
+          "value",
+          "label"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The displayed label."
+          },
+          "value": {
+            "type": "string",
+            "description": "The submitted value."
+          }
+        }
+      },
+      "FormFieldType": {
+        "type": "string",
+        "description": "Input widget type for a form field.",
+        "enum": [
+          "text",
+          "email",
+          "password",
+          "number",
+          "decimal",
+          "date",
+          "date_time",
+          "select",
+          "multiselect",
+          "autocomplete",
+          "checkbox",
+          "toggle",
+          "textarea",
+          "file",
+          "hidden",
+          "key_value"
+        ]
+      },
+      "FormFieldValidation": {
+        "type": "object",
+        "description": "Validation constraints for a form field.",
+        "properties": {
+          "custom_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Message overriding the default validation error."
+          },
+          "max": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Maximum numeric value."
+          },
+          "max_length": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Maximum string length.",
+            "minimum": 0
+          },
+          "min": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Minimum numeric value."
+          },
+          "min_length": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Minimum string length.",
+            "minimum": 0
+          },
+          "pattern": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Regex pattern the value must match."
+          }
+        }
+      },
+      "FormMethod": {
+        "type": "string",
+        "description": "HTTP method used for form submission.",
+        "enum": [
+          "post",
+          "put"
+        ]
+      },
+      "HealthInfo": {
+        "type": "object",
+        "description": "Liveness/build identity (OAPEC-9 typed body).",
+        "required": [
+          "status",
+          "service",
+          "version",
+          "build"
+        ],
+        "properties": {
+          "build": {
+            "type": "string",
+            "description": "The build hash."
+          },
+          "service": {
+            "type": "string",
+            "description": "The service identifier."
+          },
+          "status": {
+            "type": "string",
+            "description": "Always `ok` while serving."
+          },
+          "version": {
+            "type": "string",
+            "description": "The build version."
+          }
+        }
+      },
+      "HostSubmit": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewOrderRequest"
+          },
+          {
+            "type": "object",
+            "required": [
+              "usr_id"
+            ],
+            "properties": {
+              "on_behalf_of": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "usr_id": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "One host-function request (Func → Desk proxy-back)."
+      },
+      "HostSubmitResponse": {
+        "type": "object",
+        "description": "Func-host submit result (on-behalf-of tracked).",
+        "required": [
+          "order_id",
+          "state"
+        ],
+        "properties": {
+          "on_behalf_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The on-behalf-of principal."
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The desk order id."
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState",
+            "description": "The order state."
+          }
+        }
+      },
+      "MutationAck": {
+        "type": "object",
+        "description": "Mutation acknowledgement (cancel).",
+        "required": [
+          "order_id",
+          "state"
+        ],
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The affected order id."
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState",
+            "description": "The resulting state."
+          }
+        }
+      },
+      "NewOrderRequest": {
+        "type": "object",
+        "description": "New-order request as submitted through the BFF/WS.",
+        "required": [
+          "client_order_id",
+          "symbol_name",
+          "destination_id",
+          "side",
+          "order_type",
+          "tif",
+          "qty"
+        ],
+        "properties": {
+          "client_order_id": {
+            "type": "string",
+            "description": "Client-generated; dedupe key for resubmit-after-reconnect."
+          },
+          "destination_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {},
+          "on_behalf_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Manager acting on behalf (must hold `order:cancel:admin`-class scope)."
+          },
+          "order_type": {
+            "$ref": "#/components/schemas/OrderType"
+          },
+          "price": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "qty": {
+            "type": "string",
+            "description": "Decimal strings - scale resolved against the instrument."
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "stop_price": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "symbol_name": {
+            "type": "string"
+          },
+          "tif": {
+            "$ref": "#/components/schemas/TimeInForce"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "description": "A normalized order. This is the full self-contained snapshot carried by\n`trade8:desk:order:submitted` and persisted in `desk.\"order\"`.",
+        "required": [
+          "order_id",
+          "client_order_id",
+          "chain_root_id",
+          "usr_id",
+          "office_id",
+          "symbol_id",
+          "symbol_name",
+          "market_id",
+          "destination_id",
+          "side",
+          "order_type",
+          "tif",
+          "qty",
+          "state",
+          "leaves_qty",
+          "filled_qty",
+          "flags",
+          "submitted_at"
+        ],
+        "properties": {
+          "chain_root_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "client_order_id": {
+            "type": "string"
+          },
+          "destination_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "filled_qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "flags": {
+            "description": "Order-class properties + custom flags (raw `ORDER_PROPERTY` rows)."
+          },
+          "leaves_qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "market_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "office_id": {
+            "type": "string"
+          },
+          "on_behalf_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Manager acting on a trader's behalf (attribution)."
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_type": {
+            "$ref": "#/components/schemas/OrderType"
+          },
+          "price": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Price",
+                "description": "Limit price (market orders: `None`)."
+              }
+            ]
+          },
+          "qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "replaces_order_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Previous order id on a cancel-replace chain."
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState"
+          },
+          "stop_price": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Price",
+                "description": "Stop trigger (stop/stop-limit orders)."
+              }
+            ]
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "symbol_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol_name": {
+            "type": "string"
+          },
+          "terminal_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "tif": {
+            "$ref": "#/components/schemas/TimeInForce"
+          },
+          "usr_id": {
+            "type": "string",
+            "description": "Sentin8:Auth sub of the acting user."
+          }
+        }
+      },
+      "OrderState": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "accepted",
+          "routed",
+          "partially_filled",
+          "filled",
+          "cancelled",
+          "replaced",
+          "rejected",
+          "expired",
+          "overnight_parked"
+        ]
+      },
+      "OrderSummary": {
+        "type": "object",
+        "description": "Blotter row (API read shape).",
+        "required": [
+          "order_id",
+          "client_order_id",
+          "symbol_name",
+          "side",
+          "state",
+          "qty",
+          "leaves_qty",
+          "filled_qty",
+          "usr_id",
+          "office_id",
+          "submitted_at"
+        ],
+        "properties": {
+          "client_order_id": {
+            "type": "string"
+          },
+          "filled_qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "leaves_qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "office_id": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Price"
+              }
+            ]
+          },
+          "qty": {
+            "$ref": "#/components/schemas/Qty"
+          },
+          "side": {
+            "$ref": "#/components/schemas/Side"
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "symbol_name": {
+            "type": "string"
+          },
+          "usr_id": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderType": {
+        "type": "string",
+        "description": "Order types` on ORDERS + OrderNew).",
+        "enum": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "9"
+        ]
+      },
+      "PolicyModeBody": {
+        "type": "object",
+        "description": "`POST /v1/admin/policy-sets/{mode}` body (RFW row actions).",
+        "required": [
+          "policy_set_name"
+        ],
+        "properties": {
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "policy_set_name": {
+            "type": "string"
+          }
+        }
+      },
+      "PolicySetDetail": {
+        "type": "object",
+        "description": "One policy set in the detail view (adds the full policy text).",
+        "required": [
+          "policy_set_name",
+          "description",
+          "policies",
+          "origin",
+          "mode",
+          "version",
+          "enabled",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "description": "Creation instant (RFC 3339)."
+          },
+          "description": {
+            "type": "string",
+            "description": "Human description."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the set participates in evaluation."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Evaluation mode."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Row origin (`platform`/`tenant`)."
+          },
+          "policies": {
+            "type": "string",
+            "description": "The full policy text (Shield policy language)."
+          },
+          "policy_set_name": {
+            "type": "string",
+            "description": "The set name."
+          },
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional schema text bound to the set."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update instant (RFC 3339)."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Monotonic revision."
+          }
+        }
+      },
+      "PolicySetMutated": {
+        "type": "object",
+        "description": "A stored policy-set mutation result.",
+        "required": [
+          "policy_set_name",
+          "version",
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "The evaluation mode after the mutation."
+          },
+          "policy_set_name": {
+            "type": "string",
+            "description": "The set name."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The revision after the mutation."
+          }
+        }
+      },
+      "PolicySetRow": {
+        "type": "object",
+        "description": "One policy set in the list view (the RFW row shape).",
+        "required": [
+          "id",
+          "policy_set_name",
+          "description",
+          "origin",
+          "mode",
+          "version",
+          "enabled",
+          "policies_len",
+          "updated_at"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Human description."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the set participates in evaluation."
+          },
+          "id": {
+            "type": "string",
+            "description": "The set name; doubles as the RFW row id."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Evaluation mode (`shadow`/`enforced`)."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Row origin (`platform` enroll-managed vs `tenant`)."
+          },
+          "policies_len": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of policy statements in the set."
+          },
+          "policy_set_name": {
+            "type": "string",
+            "description": "The set name."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update instant (RFC 3339)."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Monotonic revision."
+          }
+        }
+      },
+      "PolicyTestOutcome": {
+        "type": "object",
+        "description": "A dry-run (test) outcome; nothing was stored.",
+        "required": [
+          "policy_set_name",
+          "action",
+          "decision",
+          "would_deny"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "The action evaluated."
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision",
+            "description": "The enforce-mode decision."
+          },
+          "policy_set_name": {
+            "type": "string",
+            "description": "The set name the candidate text was compiled under."
+          },
+          "would_deny": {
+            "type": "boolean",
+            "description": "Whether the shadow evaluation would deny."
+          }
+        }
+      },
+      "Price": {
+        "type": "object",
+        "description": "A scaled price. The `scale` (decimal digits) is carried per value so\ninstruments with different scales never mix silently.",
+        "required": [
+          "raw",
+          "scale"
+        ],
+        "properties": {
+          "raw": {
+            "type": "integer",
+            "description": "Scaled integer value (ticks)."
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Decimal digits (4 = equity, 8 = crypto, per-future DECIMAL_LOCATOR).",
+            "minimum": 0
+          }
+        }
+      },
+      "PrincipalAttr": {
+        "type": "object",
+        "description": "One principal attribute in the list view.",
+        "required": [
+          "subject_id",
+          "attr_key",
+          "attr_value",
+          "origin"
+        ],
+        "properties": {
+          "attr_key": {
+            "type": "string",
+            "description": "The attribute key."
+          },
+          "attr_value": {
+            "description": "The attribute value (free-form JSON by contract)."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Row origin."
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "The attribute owner (subject id)."
+          }
+        }
+      },
+      "PutAttributeBody": {
+        "type": "object",
+        "description": "`PUT /v1/admin/attributes` body - one principal attribute.",
+        "required": [
+          "subject_id",
+          "attr_key",
+          "attr_value"
+        ],
+        "properties": {
+          "attr_key": {
+            "type": "string"
+          },
+          "attr_value": {},
+          "subject_id": {
+            "type": "string"
+          }
+        }
+      },
+      "PutPolicySetBody": {
+        "type": "object",
+        "description": "`PUT /v1/admin/policy-sets/{name}` body.",
+        "required": [
+          "policies"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "policies": {
+            "type": "string"
+          },
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PutRelationBody": {
+        "type": "object",
+        "description": "`PUT /v1/admin/relations` body - one relation tuple.",
+        "required": [
+          "subject_type",
+          "subject_id",
+          "relation",
+          "object_type",
+          "object_id"
+        ],
+        "properties": {
+          "object_id": {
+            "type": "string"
+          },
+          "object_type": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string"
+          },
+          "subject_id": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string"
+          }
+        }
+      },
+      "Qty": {
+        "type": "object",
+        "description": "A decimal-scaled quantity. Equities: scale 0 (integer shares);\ncrypto: scale 8.",
+        "required": [
+          "raw",
+          "scale"
+        ],
+        "properties": {
+          "raw": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Scaled integer value.",
+            "minimum": 0
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Decimal digits.",
+            "minimum": 0
+          }
+        }
+      },
+      "RelationCheckResult": {
+        "type": "object",
+        "description": "A relation connectivity check result.",
+        "required": [
+          "subject",
+          "relation",
+          "object",
+          "direct",
+          "transitive",
+          "connected",
+          "tuple_count"
+        ],
+        "properties": {
+          "connected": {
+            "type": "boolean",
+            "description": "`direct || transitive`."
+          },
+          "direct": {
+            "type": "boolean",
+            "description": "Whether a direct tuple exists."
+          },
+          "object": {
+            "type": "string",
+            "description": "The object in `type/id` form."
+          },
+          "relation": {
+            "type": "string",
+            "description": "The relation checked."
+          },
+          "subject": {
+            "type": "string",
+            "description": "The subject in `type/id` form."
+          },
+          "transitive": {
+            "type": "boolean",
+            "description": "Whether a transitive path exists."
+          },
+          "tuple_count": {
+            "type": "integer",
+            "description": "Number of tuples inspected.",
+            "minimum": 0
+          }
+        }
+      },
+      "RelationRecordRow": {
+        "type": "object",
+        "description": "One relation tuple in the list view.",
+        "required": [
+          "subject_type",
+          "subject_id",
+          "relation",
+          "object_type",
+          "object_id",
+          "origin"
+        ],
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "description": "The object entity id."
+          },
+          "object_type": {
+            "type": "string",
+            "description": "The object entity type."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Row origin."
+          },
+          "relation": {
+            "type": "string",
+            "description": "The relation name."
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "The subject entity id."
+          },
+          "subject_type": {
+            "type": "string",
+            "description": "The subject entity type."
+          }
+        }
+      },
+      "RelationUpserted": {
+        "type": "object",
+        "description": "A relation-tuple upsert result.",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The stored tuple id."
+          },
+          "status": {
+            "type": "string",
+            "description": "Always `upserted`."
+          }
+        }
+      },
+      "RemoteWidget": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "children"
+            ],
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RemoteWidget"
+                },
+                "description": "Child widgets.\n\n`no_recursion` keeps the derive from forwarding the reference\ncollection back into [`RemoteWidget`]'s manual `ToSchema::schemas` -\nrecursion terminates at the `$ref` (see the RemoteWidget schema impl)."
+              },
+              "direction": {
+                "$ref": "#/components/schemas/ContainerDirection",
+                "description": "Layout direction of the children."
+              },
+              "padding": {
+                "type": "number",
+                "format": "double",
+                "description": "Outer padding."
+              },
+              "spacing": {
+                "type": "number",
+                "format": "double",
+                "description": "Gap between children."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "container"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "text"
+            ],
+            "properties": {
+              "align": {
+                "$ref": "#/components/schemas/TextAlign",
+                "description": "Text alignment."
+              },
+              "max_lines": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Maximum lines before ellipsis.",
+                "minimum": 0
+              },
+              "text": {
+                "type": "string",
+                "description": "The text content."
+              },
+              "text_type": {
+                "$ref": "#/components/schemas/WidgetTextType",
+                "description": "Style variant."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "columns",
+              "data_endpoint"
+            ],
+            "properties": {
+              "columns": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WidgetDataTableColumn"
+                },
+                "description": "Column definitions."
+              },
+              "data_endpoint": {
+                "type": "string",
+                "description": "The data endpoint to fetch rows (relative to the service's `/v1/admin/` prefix).\nE.g. `\"/accounts\"` → `GET /v1/admin/accounts`."
+              },
+              "empty_message": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Message shown when there are no rows."
+              },
+              "filterable": {
+                "type": "boolean",
+                "description": "Whether column filtering is enabled."
+              },
+              "page_size": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Rows per page (0 = renderer default).",
+                "minimum": 0
+              },
+              "row_actions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WidgetButton"
+                },
+                "description": "Per-row action buttons. Each button's route/endpoint supports `{row.id}` substitution."
+              },
+              "row_link": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Optional row click action - navigates to this route with `{row.id}` substitution."
+              },
+              "sortable": {
+                "type": "boolean",
+                "description": "Whether column sorting is enabled."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "data_table"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "fields",
+              "submit_endpoint"
+            ],
+            "properties": {
+              "cancel_label": {
+                "type": "string",
+                "description": "Cancel button label."
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WidgetFormField"
+                },
+                "description": "Form fields in render order."
+              },
+              "method": {
+                "$ref": "#/components/schemas/FormMethod",
+                "description": "HTTP method for submission."
+              },
+              "submit_endpoint": {
+                "type": "string",
+                "description": "The endpoint to POST the form data to (relative to `/v1/admin/`).\nE.g. `\"/accounts\"` → `POST /v1/admin/accounts`."
+              },
+              "submit_label": {
+                "type": "string",
+                "description": "Submit button label."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "form"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "label"
+            ],
+            "properties": {
+              "button_type": {
+                "$ref": "#/components/schemas/ButtonType",
+                "description": "Visual/emphasis style."
+              },
+              "endpoint": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Endpoint to POST to (for action buttons, relative to `/v1/admin/`).\nEndpoint to POST to (for action buttons, relative to `/v1/admin/`)."
+              },
+              "icon": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Material Icons code point (hex string)."
+              },
+              "label": {
+                "type": "string",
+                "description": "Button label."
+              },
+              "route": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Route to navigate to (for link buttons). Supports `{param}` substitution."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "button"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "actions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WidgetButton"
+                },
+                "description": "Buttons rendered in the card footer/header."
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RemoteWidget"
+                },
+                "description": "Card body widgets (`no_recursion` - see [`RemoteWidget`])."
+              },
+              "subtitle": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Card subtitle."
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Card title."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "card"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "chart_type",
+              "data_endpoint"
+            ],
+            "properties": {
+              "chart_type": {
+                "$ref": "#/components/schemas/ChartType",
+                "description": "The chart kind."
+              },
+              "data_endpoint": {
+                "type": "string",
+                "description": "Endpoint that returns the chart series data."
+              },
+              "height": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "format": "double",
+                "description": "Height in logical pixels."
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Chart title."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "chart"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "widget_name"
+            ],
+            "properties": {
+              "data_endpoint": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The data endpoint the native widget calls."
+              },
+              "props": {
+                "description": "Props passed to the native widget (service-specific)."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "native"
+                ]
+              },
+              "widget_name": {
+                "type": "string",
+                "description": "The native widget name the dash recognizes.\nBuilt-in hosts: `posting_console`, `payment_simulator`, `workflow_visualizer`."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "children"
+            ],
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RemoteWidget"
+                },
+                "description": "Child widgets (`no_recursion` - see [`RemoteWidget`])."
+              },
+              "spacing": {
+                "type": "number",
+                "format": "double",
+                "description": "Gap between children."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "row"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "children"
+            ],
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RemoteWidget"
+                },
+                "description": "Child widgets (`no_recursion` - see [`RemoteWidget`])."
+              },
+              "spacing": {
+                "type": "number",
+                "format": "double",
+                "description": "Gap between children."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "column"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "size": {
+                "type": "number",
+                "format": "double",
+                "description": "Gap size in logical pixels."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "spacer"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "ReplaceAck": {
+        "type": "object",
+        "description": "Replace acknowledgement.",
+        "required": [
+          "order_id",
+          "replaces",
+          "state"
+        ],
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The new order id."
+          },
+          "replaces": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The replaced (cancelled) order id."
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState",
+            "description": "The new order's state."
+          }
+        }
+      },
+      "ReplaceOrderRequest": {
+        "type": "object",
+        "description": "Cancel-replace request: cancels the referenced order and submits the\nreplacement in one chain (desk design §4.1).",
+        "required": [
+          "order_id",
+          "client_order_id",
+          "qty"
+        ],
+        "properties": {
+          "client_order_id": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "qty": {
+            "type": "string"
+          }
+        }
+      },
+      "SessionActionRequest": {
+        "type": "object",
+        "description": "Session action request.",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "The action (`open` | `close`)."
+          }
+        }
+      },
+      "SessionStateResponse": {
+        "type": "object",
+        "description": "Session state read/mutation result.",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "The session state (`open` | `closed`)."
+          }
+        }
+      },
+      "Side": {
+        "type": "string",
+        "description": "Order side. `T` (trade both sides / short-exempt cross) is preserved\nfrom .",
+        "enum": [
+          "b",
+          "s",
+          "t"
+        ]
+      },
+      "SubmitOrderResponse": {
+        "type": "object",
+        "description": "Order submit result (accept, park or duplicate echo).",
+        "required": [
+          "order_id",
+          "state"
+        ],
+        "properties": {
+          "duplicate": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Echoed for idempotent resubmits."
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The desk order id."
+          },
+          "remaining_buying_power": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Remaining buying power after the Risk verdict (i128-as-string)."
+          },
+          "state": {
+            "$ref": "#/components/schemas/OrderState",
+            "description": "The order state after the submit."
+          }
+        }
+      },
+      "SymbolsResponse": {
+        "type": "object",
+        "description": "Symbols list envelope.",
+        "required": [
+          "symbols"
+        ],
+        "properties": {
+          "symbols": {
+            "type": "array",
+            "items": {},
+            "description": "The tradable symbols with feed/instrument states."
+          }
+        }
+      },
+      "TestPolicySetBody": {
+        "type": "object",
+        "description": "`POST /v1/admin/policy-sets/{name}/test` body.",
+        "required": [
+          "policies",
+          "subject_id"
+        ],
+        "properties": {
+          "action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "policies": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Sample live-role names for role-based candidate rules."
+          },
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subject_id": {
+            "type": "string"
+          },
+          "token_tp": {
+            "type": "string"
+          }
+        }
+      },
+      "TextAlign": {
+        "type": "string",
+        "description": "Text alignment.",
+        "enum": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      "TimeInForce": {
+        "type": "string",
+        "description": "Time-in-force: `overnight` and `on_close` survive sessions; `day` sweeps at session close.",
+        "enum": [
+          "0",
+          "1",
+          "3",
+          "4",
+          "6",
+          "ON",
+          "OC"
+        ]
+      },
+      "WidgetButton": {
+        "type": "object",
+        "description": "A button (submit, cancel, row action, or link).",
+        "required": [
+          "label"
+        ],
+        "properties": {
+          "button_type": {
+            "$ref": "#/components/schemas/ButtonType",
+            "description": "Visual/emphasis style."
+          },
+          "endpoint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Endpoint to POST to (for action buttons, relative to `/v1/admin/`).\nEndpoint to POST to (for action buttons, relative to `/v1/admin/`)."
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Material Icons code point (hex string)."
+          },
+          "label": {
+            "type": "string",
+            "description": "Button label."
+          },
+          "route": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Route to navigate to (for link buttons). Supports `{param}` substitution."
+          }
+        }
+      },
+      "WidgetCard": {
+        "type": "object",
+        "description": "A glass card panel with optional title and children.",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WidgetButton"
+            },
+            "description": "Buttons rendered in the card footer/header."
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoteWidget"
+            },
+            "description": "Card body widgets (`no_recursion` - see [`RemoteWidget`])."
+          },
+          "subtitle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Card subtitle."
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Card title."
+          }
+        }
+      },
+      "WidgetChart": {
+        "type": "object",
+        "description": "A simple chart backed by a data endpoint.",
+        "required": [
+          "chart_type",
+          "data_endpoint"
+        ],
+        "properties": {
+          "chart_type": {
+            "$ref": "#/components/schemas/ChartType",
+            "description": "The chart kind."
+          },
+          "data_endpoint": {
+            "type": "string",
+            "description": "Endpoint that returns the chart series data."
+          },
+          "height": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Height in logical pixels."
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Chart title."
+          }
+        }
+      },
+      "WidgetColumn": {
+        "type": "object",
+        "description": "A vertical layout column.",
+        "required": [
+          "children"
+        ],
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoteWidget"
+            },
+            "description": "Child widgets (`no_recursion` - see [`RemoteWidget`])."
+          },
+          "spacing": {
+            "type": "number",
+            "format": "double",
+            "description": "Gap between children."
+          }
+        }
+      },
+      "WidgetContainer": {
+        "type": "object",
+        "description": "A scrollable container with layout direction and padding.",
+        "required": [
+          "children"
+        ],
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoteWidget"
+            },
+            "description": "Child widgets.\n\n`no_recursion` keeps the derive from forwarding the reference\ncollection back into [`RemoteWidget`]'s manual `ToSchema::schemas` -\nrecursion terminates at the `$ref` (see the RemoteWidget schema impl)."
+          },
+          "direction": {
+            "$ref": "#/components/schemas/ContainerDirection",
+            "description": "Layout direction of the children."
+          },
+          "padding": {
+            "type": "number",
+            "format": "double",
+            "description": "Outer padding."
+          },
+          "spacing": {
+            "type": "number",
+            "format": "double",
+            "description": "Gap between children."
+          }
+        }
+      },
+      "WidgetDataTable": {
+        "type": "object",
+        "description": "A data table with server-side rows, sorting, filtering, and pagination.",
+        "required": [
+          "columns",
+          "data_endpoint"
+        ],
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WidgetDataTableColumn"
+            },
+            "description": "Column definitions."
+          },
+          "data_endpoint": {
+            "type": "string",
+            "description": "The data endpoint to fetch rows (relative to the service's `/v1/admin/` prefix).\nE.g. `\"/accounts\"` → `GET /v1/admin/accounts`."
+          },
+          "empty_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Message shown when there are no rows."
+          },
+          "filterable": {
+            "type": "boolean",
+            "description": "Whether column filtering is enabled."
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Rows per page (0 = renderer default).",
+            "minimum": 0
+          },
+          "row_actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WidgetButton"
+            },
+            "description": "Per-row action buttons. Each button's route/endpoint supports `{row.id}` substitution."
+          },
+          "row_link": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional row click action - navigates to this route with `{row.id}` substitution."
+          },
+          "sortable": {
+            "type": "boolean",
+            "description": "Whether column sorting is enabled."
+          }
+        }
+      },
+      "WidgetDataTableColumn": {
+        "type": "object",
+        "description": "One column of a [`WidgetDataTable`].",
+        "required": [
+          "key",
+          "label"
+        ],
+        "properties": {
+          "format": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Formatter hint (e.g. `iban`, `currency`, `datetime`)."
+          },
+          "key": {
+            "type": "string",
+            "description": "Row-data key for this column."
+          },
+          "label": {
+            "type": "string",
+            "description": "Column header label."
+          },
+          "sortable": {
+            "type": "boolean",
+            "description": "Whether this column sorts."
+          },
+          "width": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Fixed width in logical pixels."
+          }
+        }
+      },
+      "WidgetForm": {
+        "type": "object",
+        "description": "A form with fields and a submit action.",
+        "required": [
+          "fields",
+          "submit_endpoint"
+        ],
+        "properties": {
+          "cancel_label": {
+            "type": "string",
+            "description": "Cancel button label."
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WidgetFormField"
+            },
+            "description": "Form fields in render order."
+          },
+          "method": {
+            "$ref": "#/components/schemas/FormMethod",
+            "description": "HTTP method for submission."
+          },
+          "submit_endpoint": {
+            "type": "string",
+            "description": "The endpoint to POST the form data to (relative to `/v1/admin/`).\nE.g. `\"/accounts\"` → `POST /v1/admin/accounts`."
+          },
+          "submit_label": {
+            "type": "string",
+            "description": "Submit button label."
+          }
+        }
+      },
+      "WidgetFormField": {
+        "type": "object",
+        "description": "One input field of a [`WidgetForm`].",
+        "required": [
+          "key",
+          "label"
+        ],
+        "properties": {
+          "default_value": {
+            "description": "Initial value."
+          },
+          "field_type": {
+            "$ref": "#/components/schemas/FormFieldType",
+            "description": "Input widget type."
+          },
+          "help_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Helper text shown below the field."
+          },
+          "key": {
+            "type": "string",
+            "description": "Field key in the submitted payload."
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label."
+          },
+          "options": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/FormFieldOption"
+            },
+            "description": "Choices for select-type fields."
+          },
+          "placeholder": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Hint shown inside the empty field."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether submission fails without a value."
+          },
+          "validation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FormFieldValidation",
+                "description": "Validation constraints."
+              }
+            ]
+          },
+          "visible_if": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FieldCondition",
+                "description": "Conditional visibility: only show this field when another field\nmatches a value. Example: `{\"field\": \"auth_mode\", \"equals\": \"staff\"}`"
+              }
+            ]
+          },
+          "width": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Width in logical pixels."
+          }
+        }
+      },
+      "WidgetNative": {
+        "type": "object",
+        "description": "A native widget host - the dash renders a built-in Flutter widget.",
+        "required": [
+          "widget_name"
+        ],
+        "properties": {
+          "data_endpoint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The data endpoint the native widget calls."
+          },
+          "props": {
+            "description": "Props passed to the native widget (service-specific)."
+          },
+          "widget_name": {
+            "type": "string",
+            "description": "The native widget name the dash recognizes.\nBuilt-in hosts: `posting_console`, `payment_simulator`, `workflow_visualizer`."
+          }
+        }
+      },
+      "WidgetRow": {
+        "type": "object",
+        "description": "A horizontal layout row.",
+        "required": [
+          "children"
+        ],
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoteWidget"
+            },
+            "description": "Child widgets (`no_recursion` - see [`RemoteWidget`])."
+          },
+          "spacing": {
+            "type": "number",
+            "format": "double",
+            "description": "Gap between children."
+          }
+        }
+      },
+      "WidgetSpacer": {
+        "type": "object",
+        "description": "An empty gap.",
+        "properties": {
+          "size": {
+            "type": "number",
+            "format": "double",
+            "description": "Gap size in logical pixels."
+          }
+        }
+      },
+      "WidgetText": {
+        "type": "object",
+        "description": "A text label with optional styling.",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "align": {
+            "$ref": "#/components/schemas/TextAlign",
+            "description": "Text alignment."
+          },
+          "max_lines": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Maximum lines before ellipsis.",
+            "minimum": 0
+          },
+          "text": {
+            "type": "string",
+            "description": "The text content."
+          },
+          "text_type": {
+            "$ref": "#/components/schemas/WidgetTextType",
+            "description": "Style variant."
+          }
+        }
+      },
+      "WidgetTextType": {
+        "type": "string",
+        "description": "Text style variant.",
+        "enum": [
+          "body",
+          "heading",
+          "subheading",
+          "caption",
+          "label",
+          "title"
+        ]
+      }
+    }
+  },
   "security": [],
   "tags": [
     {

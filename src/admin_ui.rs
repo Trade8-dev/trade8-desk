@@ -68,7 +68,7 @@ fn card(title: &str, body: &str) -> RemoteWidget {
     get,
     path = "/v1/admin/ui/{page}",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "OK", body = sentin8::rfw::AdminUiResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -217,7 +217,8 @@ fn q_i64(q: &Qp, key: &str, default: i64) -> i64 {
     get,
     path = "/v1/admin/orders",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -230,7 +231,7 @@ pub async fn admin_orders(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
     Query(q): Query<Qp>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -276,7 +277,7 @@ pub async fn admin_orders(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!(rows
+    Ok(Json(rows
         .into_iter()
         .map(
             |(
@@ -300,13 +301,14 @@ pub async fn admin_orders(
                 })
             }
         )
-        .collect::<Vec<_>>())))
+        .collect::<Vec<_>>()))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/overview",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -318,7 +320,7 @@ pub async fn admin_orders(
 pub async fn admin_overview(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -346,16 +348,17 @@ pub async fn admin_overview(
     .fetch_one(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!([{
+    Ok(Json(vec![serde_json::json!({
         "state": st.engine.session_state().as_str(),
         "working": working, "today": today, "parked": parked,
-    }])))
+    })]))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/symbols",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -367,7 +370,7 @@ pub async fn admin_overview(
 pub async fn admin_symbols(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -384,13 +387,14 @@ pub async fn admin_symbols(
         .map_err(sentin8::shell::err_db)?;
     sentin8::shell::set_tenant_context(&mut conn, a.env_id()).await;
     let rows = st.engine.symbols_json();
-    Ok(Json(serde_json::json!(rows)))
+    Ok(Json(rows))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/markets",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -402,7 +406,7 @@ pub async fn admin_symbols(
 pub async fn admin_markets(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -427,7 +431,7 @@ pub async fn admin_markets(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!(rows
+    Ok(Json(rows
         .into_iter()
         .map(
             |(market_id, code, description, asset_class, timezone, uptick_rule)| {
@@ -437,13 +441,14 @@ pub async fn admin_markets(
                 })
             }
         )
-        .collect::<Vec<_>>())))
+        .collect::<Vec<_>>()))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/destinations",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -455,7 +460,7 @@ pub async fn admin_markets(
 pub async fn admin_destinations(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -481,7 +486,7 @@ pub async fn admin_destinations(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!(rows
+    Ok(Json(rows
         .into_iter()
         .map(
             |(destination_id, name, protocol, endpoint_url, min_size, enable)| {
@@ -492,13 +497,14 @@ pub async fn admin_destinations(
                 })
             }
         )
-        .collect::<Vec<_>>())))
+        .collect::<Vec<_>>()))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/offices",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -510,7 +516,7 @@ pub async fn admin_destinations(
 pub async fn admin_offices(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -535,7 +541,7 @@ pub async fn admin_offices(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!(rows
+    Ok(Json(rows
         .into_iter()
         .map(|(office_id, name, status, country_code)| {
             serde_json::json!({
@@ -543,13 +549,14 @@ pub async fn admin_offices(
                 "status": status, "country_code": country_code,
             })
         })
-        .collect::<Vec<_>>())))
+        .collect::<Vec<_>>()))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/borrow",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -561,7 +568,7 @@ pub async fn admin_offices(
 pub async fn admin_borrow(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -586,7 +593,7 @@ pub async fn admin_borrow(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(serde_json::json!(rows
+    Ok(Json(rows
         .into_iter()
         .map(|(symbol_id, total_shares, available_shares)| {
             serde_json::json!({
@@ -595,13 +602,14 @@ pub async fn admin_borrow(
                 "available_shares": available_shares,
             })
         })
-        .collect::<Vec<_>>())))
+        .collect::<Vec<_>>()))
 }
 #[utoipa::path(
     get,
     path = "/v1/admin/session",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Admin rows", body = Vec<serde_json::Value>),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -613,7 +621,7 @@ pub async fn admin_borrow(
 pub async fn admin_session(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -622,16 +630,17 @@ pub async fn admin_session(
         sentin8::shield::EvalTarget::new("trade8:market:session:manage"),
     )
     .await?;
-    Ok(Json(serde_json::json!([{
+    Ok(Json(vec![serde_json::json!({
         "state": st.engine.session_state().as_str(),
         "working": st.engine.working_count(),
-    }])))
+    })]))
 }
 #[utoipa::path(
     post,
     path = "/v1/admin/session",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Session state", body = crate::SessionStateResponse),
+
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -644,8 +653,8 @@ pub async fn admin_session(
 pub async fn admin_session_action(
     State(st): State<std::sync::Arc<DeskState>>,
     headers: HeaderMap,
-    axum::Json(body): axum::Json<serde_json::Value>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+    axum::Json(body): axum::Json<crate::SessionActionRequest>,
+) -> Result<Json<crate::SessionStateResponse>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -654,7 +663,9 @@ pub async fn admin_session_action(
         sentin8::shield::EvalTarget::new("trade8:market:session:manage"),
     )
     .await?;
-    let action = body.get("action").and_then(|a| a.as_str()).unwrap_or("");
+    let action = body.action.as_str();
     let state = st.engine.session_action(action).await;
-    Ok(Json(serde_json::json!({"state": state.as_str()})))
+    Ok(Json(crate::SessionStateResponse {
+        state: state.as_str().to_string(),
+    }))
 }

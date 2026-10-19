@@ -144,11 +144,125 @@ fn rej_http(rej: &Rejection) -> (axum::http::StatusCode, String) {
         serde_json::to_string(rej).unwrap_or_else(|_| "order rejected".into()),
     )
 }
+// ── Typed response DTOs (OAPEC-9) ──────────────────────────────────────
+
+/// Liveness/build identity (OAPEC-9 typed body).
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct HealthInfo {
+    /// Always `ok` while serving.
+    pub status: String,
+    /// The service identifier.
+    pub service: String,
+    /// The build version.
+    pub version: String,
+    /// The build hash.
+    pub build: String,
+}
+
+/// Order submit result (accept, park or duplicate echo).
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct SubmitOrderResponse {
+    /// The desk order id.
+    pub order_id: uuid::Uuid,
+    /// The order state after the submit.
+    pub state: trade8::contracts::OrderState,
+    /// Remaining buying power after the Risk verdict (i128-as-string).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remaining_buying_power: Option<String>,
+    /// Echoed for idempotent resubmits.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duplicate: Option<bool>,
+}
+
+/// Batch submit result.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct BatchResponse {
+    /// Per-order accept rows (`order_id`, `state`, optional `duplicate`).
+    pub accepted: Vec<serde_json::Value>,
+    /// Client-order-id + rejection rows.
+    pub rejected: Vec<serde_json::Value>,
+}
+
+/// Mutation acknowledgement (cancel).
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct MutationAck {
+    /// The affected order id.
+    pub order_id: uuid::Uuid,
+    /// The resulting state.
+    pub state: trade8::contracts::OrderState,
+}
+
+/// Replace acknowledgement.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct ReplaceAck {
+    /// The new order id.
+    pub order_id: uuid::Uuid,
+    /// The replaced (cancelled) order id.
+    pub replaces: uuid::Uuid,
+    /// The new order's state.
+    pub state: trade8::contracts::OrderState,
+}
+
+/// Flatten acknowledgement.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct FlattenAck {
+    /// Flatten orders submitted to the blotter.
+    pub flatten_orders_submitted: usize,
+}
+
+/// Session state read/mutation result.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct SessionStateResponse {
+    /// The session state (`open` | `closed`).
+    pub state: String,
+}
+
+/// Session action request.
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+pub struct SessionActionRequest {
+    /// The action (`open` | `close`).
+    pub action: String,
+}
+
+/// Borrow pool envelope.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct BorrowPool {
+    /// Per-symbol availability rows.
+    pub pool: Vec<serde_json::Value>,
+}
+
+/// Symbols list envelope.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct SymbolsResponse {
+    /// The tradable symbols with feed/instrument states.
+    pub symbols: Vec<serde_json::Value>,
+}
+
+/// Borrow mutation acknowledgement (symbol-scoped, order-id fields unused).
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct BorrowMutationAck {
+    /// The affected symbol id.
+    pub symbol_id: uuid::Uuid,
+    /// Always `ok` (else the request errors).
+    pub status: String,
+}
+
+/// Func-host submit result (on-behalf-of tracked).
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct HostSubmitResponse {
+    /// The desk order id.
+    pub order_id: uuid::Uuid,
+    /// The order state.
+    pub state: trade8::contracts::OrderState,
+    /// The on-behalf-of principal.
+    pub on_behalf_of: Option<String>,
+}
+
 #[utoipa::path(
     post,
     path = "/v1/orders",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Order accepted/parked/duplicate echo", body = SubmitOrderResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -163,7 +277,7 @@ pub(crate) async fn submit_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(req): Json<NewOrderRequest>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<SubmitOrderResponse>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -186,9 +300,12 @@ pub(crate) async fn submit_order(
     };
     // Idempotent resubmit: an existing order returns as-is (no re-auth).
     if pending.state != trade8::contracts::OrderState::Pending {
-        return Ok(Json(serde_json::json!({
-            "order_id": pending.order_id, "state": pending.state, "duplicate": true,
-        })));
+        return Ok(Json(SubmitOrderResponse {
+            order_id: pending.order_id,
+            state: pending.state,
+            remaining_buying_power: None,
+            duplicate: Some(true),
+        }));
     }
     // Step 2: Risk authorize (fail-closed on outage).
     match st
@@ -224,11 +341,12 @@ pub(crate) async fn submit_order(
                     .ok();
                 return Err(sentin8::shell::err_db(e));
             }
-            Ok(Json(serde_json::json!({
-                "order_id": order.order_id,
-                "state": order.state,
-                "remaining_buying_power": verdict.remaining_buying_power,
-            })))
+            Ok(Json(SubmitOrderResponse {
+                order_id: order.order_id,
+                state: order.state,
+                remaining_buying_power: verdict.remaining_buying_power.map(|v| v.to_string()),
+                duplicate: None,
+            }))
         }
         Ok(verdict) => {
             // Risk deny: map the code, journal the rejection with the
@@ -278,7 +396,7 @@ async fn submit_rejected(
     usr: &str,
     office: &str,
     rej: Rejection,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<SubmitOrderResponse>, (axum::http::StatusCode, String)> {
     // the context is transaction-local - set it INSIDE an
     // explicit tx with the DML, never on a bare connection.
     let mut conn = match st.core.pool.acquire().await {
@@ -304,7 +422,7 @@ async fn submit_rejected(
     post,
     path = "/v1/orders/batch",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Batch accept/reject rows", body = BatchResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -319,7 +437,7 @@ pub(crate) async fn submit_batch(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(reqs): Json<Vec<NewOrderRequest>>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<BatchResponse>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -418,15 +536,16 @@ pub(crate) async fn submit_batch(
     )
     .await;
     tx.commit().await.ok(); // dropping an uncommitted tx rolls back
-    Ok(Json(
-        serde_json::json!({"accepted": accepted, "rejected": rejected}),
-    ))
+    Ok(Json(BatchResponse {
+        accepted,
+        rejected,
+    }))
 }
 #[utoipa::path(
     get,
     path = "/v1/orders",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Order list (blotter)", body = Vec<trade8::contracts::OrderSummary>),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -490,7 +609,7 @@ pub(crate) async fn list_orders(
     get,
     path = "/v1/orders/{id}",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Order detail", body = trade8::contracts::Order),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -502,7 +621,7 @@ pub(crate) async fn get_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<trade8::contracts::Order>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -529,12 +648,12 @@ pub(crate) async fn get_order(
         }
     };
     match store::load_order(&mut tx, env, id).await {
-        Ok(Some(o)) => Ok(Json(serde_json::to_value(&o).unwrap_or_default())),
+        Ok(Some(o)) => Ok(Json(o)),
         Ok(None) => {
             // Fresh submits in degraded mode may live only in engine memory.
             st.engine
                 .order_by_id(id)
-                .map(|o| Json(serde_json::to_value(&o).unwrap_or_default()))
+                .map(Json)
                 .ok_or_else(|| (axum::http::StatusCode::NOT_FOUND, "order not found".into()))
         }
         Err(e) => Err(sentin8::shell::err_db(e)),
@@ -544,7 +663,7 @@ pub(crate) async fn get_order(
     delete,
     path = "/v1/orders/{id}",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Cancelled", body = MutationAck),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -556,7 +675,7 @@ pub(crate) async fn cancel_order(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<MutationAck>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -600,9 +719,10 @@ pub(crate) async fn cancel_order(
                 tracing::warn!(error = %e, "trade8:desk: cancel persist failed");
                 return Err(sentin8::shell::err_db(e));
             }
-            Ok(Json(
-                serde_json::json!({"order_id": o.order_id, "state": o.state}),
-            ))
+            Ok(Json(MutationAck {
+                order_id: o.order_id,
+                state: o.state,
+            }))
         }
         Err(rej) => Err(rej_http(&rej)),
     }
@@ -611,7 +731,7 @@ pub(crate) async fn cancel_order(
     post,
     path = "/v1/orders/{id}/replace",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Replaced", body = ReplaceAck),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -624,7 +744,7 @@ pub(crate) async fn replace_order(
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
     Json(req): Json<ReplaceOrderRequest>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<ReplaceAck>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -657,11 +777,11 @@ pub(crate) async fn replace_order(
                 tracing::warn!(error = %e, "trade8:desk: replace persist failed");
                 return Err(sentin8::shell::err_db(e));
             }
-            Ok(Json(serde_json::json!({
-                "order_id": o.order_id,
-                "replaces": id,
-                "state": o.state,
-            })))
+            Ok(Json(ReplaceAck {
+                order_id: o.order_id,
+                replaces: id,
+                state: o.state,
+            }))
         }
         Err(rej) => Err(rej_http(&rej)),
     }
@@ -670,7 +790,7 @@ pub(crate) async fn replace_order(
     post,
     path = "/v1/positions/flatten",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Flatten orders submitted", body = FlattenAck),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -682,7 +802,7 @@ pub(crate) async fn flatten(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(req): Json<FlattenRequest>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<FlattenAck>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -725,13 +845,15 @@ pub(crate) async fn flatten(
     )
     .await;
     tx.commit().await.ok(); // dropping an uncommitted tx rolls back
-    Ok(Json(serde_json::json!({"flatten_orders_submitted": count})))
+    Ok(Json(FlattenAck {
+        flatten_orders_submitted: count,
+    }))
 }
 #[utoipa::path(
     get,
     path = "/v1/session",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Session state", body = SessionStateResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -742,7 +864,7 @@ pub(crate) async fn flatten(
 pub(crate) async fn session_state(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<SessionStateResponse>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -751,15 +873,15 @@ pub(crate) async fn session_state(
         sentin8::shield::EvalTarget::new("trade8:desk:order:read"),
     )
     .await?;
-    Ok(Json(
-        serde_json::json!({"state": st.engine.session_state().as_str()}),
-    ))
+    Ok(Json(SessionStateResponse {
+        state: st.engine.session_state().as_str().to_string(),
+    }))
 }
 #[utoipa::path(
     post,
     path = "/v1/session",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Session action", body = SessionStateResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -774,8 +896,8 @@ pub(crate) async fn session_state(
 pub(crate) async fn session_action(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
-    Json(body): Json<serde_json::Value>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+    Json(body): Json<SessionActionRequest>,
+) -> Result<Json<SessionStateResponse>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     // trade8:cron:run - the Cron proxy-back M2M. Step 5 - Shield
     // decides on the session-manage action.
@@ -787,7 +909,7 @@ pub(crate) async fn session_action(
     )
     .await?;
     let env = auth.env_id();
-    let action = body.get("action").and_then(|a| a.as_str()).unwrap_or("");
+    let action = body.action.as_str();
     let prev_state = st.engine.session_state();
     let state = st.engine.session_action(action).await;
     let mut conn = st
@@ -823,7 +945,9 @@ pub(crate) async fn session_action(
         }
         let _ = store::insert_outbox_event(&mut tx, env, events::SESSION_STATE, swept).await;
     }
-    Ok(Json(serde_json::json!({"state": state.as_str()})))
+    Ok(Json(SessionStateResponse {
+        state: state.as_str().to_string(),
+    }))
 }
 
 /// Persist the engine's close-sweep results. The engine already
@@ -911,7 +1035,7 @@ async fn restore_overnight(
     get,
     path = "/v1/symbols",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Tradable symbols", body = SymbolsResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -922,7 +1046,7 @@ async fn restore_overnight(
 pub(crate) async fn list_symbols(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
-) -> Result<Json<Vec<serde_json::Value>>, (axum::http::StatusCode, String)> {
+) -> Result<Json<SymbolsResponse>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -931,13 +1055,15 @@ pub(crate) async fn list_symbols(
         sentin8::shield::EvalTarget::new("trade8:desk:order:read"),
     )
     .await?;
-    Ok(Json(st.engine.symbols_json()))
+    Ok(Json(SymbolsResponse {
+        symbols: st.engine.symbols_json(),
+    }))
 }
 #[utoipa::path(
     get,
     path = "/v1/borrow",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Borrow pool", body = BorrowPool),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -950,7 +1076,7 @@ pub(crate) async fn borrow_read(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Query(q): Query<std::collections::HashMap<String, String>>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<BorrowPool>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -982,13 +1108,15 @@ pub(crate) async fn borrow_read(
             })
         })
         .collect();
-    Ok(Json(serde_json::json!({"pool": rows})))
+    Ok(Json(BorrowPool {
+        pool: rows,
+    }))
 }
 #[utoipa::path(
     post,
     path = "/v1/borrow",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Borrow mutated", body = BorrowMutationAck),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -1002,7 +1130,7 @@ pub(crate) async fn borrow_mutate(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(m): Json<store::BorrowMutation>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<BorrowMutationAck>, (axum::http::StatusCode, String)> {
     let auth = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -1032,15 +1160,16 @@ pub(crate) async fn borrow_mutate(
         .await
         .map_err(sentin8::shell::err_db)?;
     tx.commit().await.ok(); // dropping an uncommitted tx rolls back
-    Ok(Json(
-        serde_json::json!({"symbol_id": m.symbol_id, "status": "ok"}),
-    ))
+    Ok(Json(BorrowMutationAck {
+        symbol_id: m.symbol_id,
+        status: "ok".into(),
+    }))
 }
 #[utoipa::path(
     get,
     path = "/ws",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 101, description = "Protocol upgraded (binary FIX/OUCH framing)"),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -1134,7 +1263,7 @@ async fn ws_loop(mut socket: WebSocket, st: Arc<DeskState>) {
     post,
     path = "/v1/internal/func-host/orders",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Func-host submit", body = HostSubmitResponse),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -1149,7 +1278,7 @@ pub(crate) async fn func_host_submit(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Json(host): Json<wiring::func_host::HostSubmit>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<HostSubmitResponse>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -1166,9 +1295,11 @@ pub(crate) async fn func_host_submit(
     let mut req = host.req;
     req.on_behalf_of = Some(host.on_behalf_of.unwrap_or_else(|| "func".into()));
     match st.engine.submit_with_actor(&host.usr_id, &office, req) {
-        Ok(o) => Ok(Json(serde_json::json!({
-            "order_id": o.order_id, "state": o.state, "on_behalf_of": o.on_behalf_of,
-        }))),
+        Ok(o) => Ok(Json(HostSubmitResponse {
+            order_id: o.order_id,
+            state: o.state,
+            on_behalf_of: o.on_behalf_of,
+        })),
         Err(r) => Err(rej_http(&r)),
     }
 }
@@ -1176,7 +1307,7 @@ pub(crate) async fn func_host_submit(
     get,
     path = "/v1/internal/func-host/orders/{id}",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Func-host order", body = trade8::contracts::Order),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -1189,7 +1320,7 @@ pub(crate) async fn func_host_get(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<trade8::contracts::Order>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -1199,7 +1330,7 @@ pub(crate) async fn func_host_get(
     )
     .await?;
     match st.engine.order_by_id(id) {
-        Some(o) => Ok(Json(serde_json::to_value(&o).unwrap_or_default())),
+        Some(o) => Ok(Json(o)),
         None => Err((axum::http::StatusCode::NOT_FOUND, "order not found".into())),
     }
 }
@@ -1207,7 +1338,7 @@ pub(crate) async fn func_host_get(
     post,
     path = "/v1/internal/func-host/orders/{id}/cancel",
     responses(
-        (status = 200, description = "OK", body = serde_json::Value),
+        (status = 200, description = "Func-host cancel", body = MutationAck),
         (status = 401, description = "Not authenticated"),
         (status = 403, description = "Forbidden"),
     ),
@@ -1220,7 +1351,7 @@ pub(crate) async fn func_host_cancel(
     State(st): State<Arc<DeskState>>,
     headers: axum::http::HeaderMap,
     Path(id): Path<uuid::Uuid>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<MutationAck>, (axum::http::StatusCode, String)> {
     let _a = sentin8::shell::verify_token(&st.core.config, &headers).await?;
     sentin8::shell::policy::require(
         &st.core.admin.policy,
@@ -1230,9 +1361,10 @@ pub(crate) async fn func_host_cancel(
     )
     .await?;
     match st.engine.cancel_with_actor("func", id) {
-        Ok(o) => Ok(Json(
-            serde_json::json!({"order_id": o.order_id, "state": o.state}),
-        )),
+        Ok(o) => Ok(Json(MutationAck {
+            order_id: o.order_id,
+            state: o.state,
+        })),
         Err(r) => Err(rej_http(&r)),
     }
 }

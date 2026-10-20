@@ -14,7 +14,6 @@ use utoipa::OpenApi;
 
 pub mod w {
 
-
     /// Spec wrapper for the inline health closure (binary has no named fn).
     #[utoipa::path(
         get,
@@ -26,7 +25,6 @@ pub mod w {
         tag = "desk",
     )]
     pub async fn desk_health() {}
-
 }
 
 /// OpenAPI spec for the desk API.

@@ -277,31 +277,32 @@ pub async fn admin_orders(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(rows
-        .into_iter()
-        .map(
-            |(
-                order_id,
-                client_order_id,
-                symbol_name,
-                side,
-                state,
-                qty,
-                leaves_qty,
-                usr_id,
-                office_id,
-                tif,
-                submitted_at,
-            )| {
-                serde_json::json!({
-                    "order_id": order_id, "client_order_id": client_order_id,
-                    "symbol_name": symbol_name, "side": side, "state": state,
-                    "qty": qty, "leaves_qty": leaves_qty, "usr_id": usr_id,
-                    "office_id": office_id, "tif": tif, "submitted_at": submitted_at,
-                })
-            }
-        )
-        .collect::<Vec<_>>()))
+    Ok(Json(
+        rows.into_iter()
+            .map(
+                |(
+                    order_id,
+                    client_order_id,
+                    symbol_name,
+                    side,
+                    state,
+                    qty,
+                    leaves_qty,
+                    usr_id,
+                    office_id,
+                    tif,
+                    submitted_at,
+                )| {
+                    serde_json::json!({
+                        "order_id": order_id, "client_order_id": client_order_id,
+                        "symbol_name": symbol_name, "side": side, "state": state,
+                        "qty": qty, "leaves_qty": leaves_qty, "usr_id": usr_id,
+                        "office_id": office_id, "tif": tif, "submitted_at": submitted_at,
+                    })
+                },
+            )
+            .collect::<Vec<_>>(),
+    ))
 }
 #[utoipa::path(
     get,
@@ -486,18 +487,19 @@ pub async fn admin_destinations(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(rows
-        .into_iter()
-        .map(
-            |(destination_id, name, protocol, endpoint_url, min_size, enable)| {
-                serde_json::json!({
-                    "destination_id": destination_id, "name": name,
-                    "protocol": protocol, "endpoint_url": endpoint_url,
-                    "min_size": min_size, "enable": enable,
-                })
-            }
-        )
-        .collect::<Vec<_>>()))
+    Ok(Json(
+        rows.into_iter()
+            .map(
+                |(destination_id, name, protocol, endpoint_url, min_size, enable)| {
+                    serde_json::json!({
+                        "destination_id": destination_id, "name": name,
+                        "protocol": protocol, "endpoint_url": endpoint_url,
+                        "min_size": min_size, "enable": enable,
+                    })
+                },
+            )
+            .collect::<Vec<_>>(),
+    ))
 }
 #[utoipa::path(
     get,
@@ -541,15 +543,16 @@ pub async fn admin_offices(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(rows
-        .into_iter()
-        .map(|(office_id, name, status, country_code)| {
-            serde_json::json!({
-                "office_id": office_id, "name": name,
-                "status": status, "country_code": country_code,
+    Ok(Json(
+        rows.into_iter()
+            .map(|(office_id, name, status, country_code)| {
+                serde_json::json!({
+                    "office_id": office_id, "name": name,
+                    "status": status, "country_code": country_code,
+                })
             })
-        })
-        .collect::<Vec<_>>()))
+            .collect::<Vec<_>>(),
+    ))
 }
 #[utoipa::path(
     get,
@@ -593,16 +596,17 @@ pub async fn admin_borrow(
     .fetch_all(&mut *conn)
     .await
     .map_err(sentin8::shell::err_db)?;
-    Ok(Json(rows
-        .into_iter()
-        .map(|(symbol_id, total_shares, available_shares)| {
-            serde_json::json!({
-                "symbol_id": symbol_id,
-                "total_shares": total_shares,
-                "available_shares": available_shares,
+    Ok(Json(
+        rows.into_iter()
+            .map(|(symbol_id, total_shares, available_shares)| {
+                serde_json::json!({
+                    "symbol_id": symbol_id,
+                    "total_shares": total_shares,
+                    "available_shares": available_shares,
+                })
             })
-        })
-        .collect::<Vec<_>>()))
+            .collect::<Vec<_>>(),
+    ))
 }
 #[utoipa::path(
     get,

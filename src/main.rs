@@ -18,8 +18,8 @@ mod admin_ui;
 mod borrow;
 mod catalog;
 mod engine;
-mod registration;
 mod openapi;
+mod registration;
 mod session;
 mod store;
 mod wiring;
@@ -536,10 +536,7 @@ pub(crate) async fn submit_batch(
     )
     .await;
     tx.commit().await.ok(); // dropping an uncommitted tx rolls back
-    Ok(Json(BatchResponse {
-        accepted,
-        rejected,
-    }))
+    Ok(Json(BatchResponse { accepted, rejected }))
 }
 #[utoipa::path(
     get,
@@ -1108,9 +1105,7 @@ pub(crate) async fn borrow_read(
             })
         })
         .collect();
-    Ok(Json(BorrowPool {
-        pool: rows,
-    }))
+    Ok(Json(BorrowPool { pool: rows }))
 }
 #[utoipa::path(
     post,

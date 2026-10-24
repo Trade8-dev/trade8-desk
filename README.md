@@ -163,4 +163,4 @@ HTTP reply. The bus relay is asynchronous and never blocks acceptance.
 
 ---
 
-**Design attribution:** trade8:desk and its underlying concepts were designed by Hamid Jahanzad <Hamid@Jahanzad.com>.
+**Architecture & Design:** trade8:desk and its underlying concepts were designed by [Hamid Jahanzad](https://www.linkedin.com/in/hamidjahanzad/).

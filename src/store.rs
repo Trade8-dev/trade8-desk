@@ -83,11 +83,11 @@ fn tif_from(s: &str) -> TimeInForce {
     }
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Bootstrap: load reference tables into the catalog snapshot.
 // Runs at startup on a fresh connection with the service's own env id
 // (boot context - the M2M token's env; runs once before serving).
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Load catalogs for one env into the engine's arc-swap snapshot.
 /// Failure is logged, not fatal - the service still serves health and
@@ -176,9 +176,9 @@ async fn bootstrap_catalog_inner(
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Order persistence: order + event + outbox event in ONE transaction.
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Persist a newly accepted order: INSERT order row, INSERT order_event,
 /// INSERT outbox event row (`trade8:desk:order:accepted`) - same tx.
@@ -342,9 +342,9 @@ pub async fn insert_outbox_event(
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Session-close sweep + overnight restore
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Persist one swept order (cancel or park) + its journal row. Called
 /// from the sweep loop with the already-mutated engine order.
@@ -435,9 +435,9 @@ pub async fn persist_restored(
     .await
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Borrow pool bootstrap + CRUD
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Load the borrow pool from the reference tables into the engine.
 /// Short-locate is on the accept hot path - the pool must be resident.
@@ -604,9 +604,9 @@ pub async fn persist_borrow_mutation(
     .await
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Reads: DB-backed blotter + order detail with explicit env filter.
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Row shape for the read paths (order + symbol name join).
 #[derive(sqlx::FromRow)]
@@ -795,9 +795,9 @@ pub async fn open_order_count(
     Ok(n)
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Keystroke audit
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Append a keystroke audit row + `keysroke:logged` outbox event (same tx).
 pub async fn log_keystroke(

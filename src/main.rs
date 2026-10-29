@@ -126,7 +126,7 @@ fn extend_router(app: Router<Arc<DeskState>>, _state: Arc<DeskState>) -> Router<
         .route(
             "/v1/health",
             // Carries the binary's build identity (`version`/`build`,
-            // BUILDID-1) so captain's monitor populates `make status`'s
+            //) so captain's monitor populates `make status`'s
             // VERSION column - the consuming BINARY's identity.
             get(|| async { Json(serde_json::json!({"status": "ok", "service": "trade8:desk", "version": sentin8::build_info::id(), "build": sentin8::build_info::build_hash()})) }),
         )
@@ -144,9 +144,9 @@ fn rej_http(rej: &Rejection) -> (axum::http::StatusCode, String) {
         serde_json::to_string(rej).unwrap_or_else(|_| "order rejected".into()),
     )
 }
-// ── Typed response DTOs (OAPEC-9) ──────────────────────────────────────
+// ── Typed response DTOs ──────────────────────────────────────
 
-/// Liveness/build identity (OAPEC-9 typed body).
+/// Liveness/build identity (typed body).
 #[derive(Debug, serde::Serialize, utoipa::ToSchema)]
 pub struct HealthInfo {
     /// Always `ok` while serving.
@@ -1429,21 +1429,21 @@ impl sentin8::shield::admin::HasPolicyAdmin for DeskState {
     }
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Handler tests (test-architecture design §7). The 8-step pipeline over
 // the REAL router: verify (1-4) against a LOCAL JWKS stand-in (one
 // ephemeral listener; SigningKeys::generate_for_testing both serves the
 // JWKS doc and mints the tokens), Shield gate (5) from the real
 // scope-mirror seed, RLS context (6+) on db trade8 via the service role
 // (skip-offline like sql_matrix).
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // The in-file `handler_tests` module below exercises handler flows against
 // an ephemeral OIDC stand-in. It references `sentin8_auth::jwks` /
 // `sentin8_auth::jwt` - the Auth SERVER crate - which this repo never
 // declared as a dependency (no vertical pins the auth server; imports go
 // through the platform SDK facade, which does not re-export jwks). The
 // harness therefore never compiled as-is. Disabled pending the SDK-side
-// test-harness OIDC stand-in surface (backlog story T8-HARNESS-1).
+// test-harness OIDC stand-in surface.
 #[cfg(all(test, feature = "handler_tests"))]
 mod handler_tests {
     use super::*;

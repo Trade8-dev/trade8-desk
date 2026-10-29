@@ -23,7 +23,7 @@ default = []
 # checkout) leaves this OFF; the aggregation-tree operator turns it on.
 cross_repo_flows = []
 # Never compiled as-is (see src/main.rs handler_tests gate) - placeholder
-# for the SDK-side test-harness OIDC stand-in (backlog T8-HARNESS-1).
+# for the SDK-side test-harness OIDC stand-in (backlog).
 handler_tests = []
 
 [dependencies]

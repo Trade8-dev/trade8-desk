@@ -83,9 +83,9 @@ async fn probe_conn() -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
     pool.acquire().await.ok()
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Fixtures
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 fn catalog_fixture() -> (SymbolRow, DestinationRow) {
     // Name uniqueness per CALL (not per process): parallel tests each
@@ -359,9 +359,9 @@ async fn cleanup_referents(
     tx.commit().await.unwrap();
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // RLS matrix (design §5.1)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// RLS: no tenant context → 0 rows (silent enforcement, FORCE RLS).
 #[tokio::test]
@@ -403,9 +403,9 @@ async fn rls_matrix_cross_env_returns_zero() {
     cleanup_referents(&mut conn, env_a(), &sym, &dest, "u-sql", "HO").await;
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Outbox-first atomicity: persist_order_accepted
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// One `persist_order_accepted` call → order row (×10⁴ price), event row
 /// (pending→accepted), outbox event row (`stream_family='desk'`) - all
@@ -555,9 +555,9 @@ async fn persist_transition_updates_and_journals() {
     cleanup_referents(&mut conn, env_a(), &sym, &dest, "u-sql", "HO").await;
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Overnight park → load → restore (design §5.1 #4)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #[tokio::test]
 async fn overnight_park_restore_roundtrip() {
@@ -642,9 +642,9 @@ async fn overnight_park_restore_roundtrip() {
     cleanup_referents(&mut conn, env_a(), &sym, &dest, "u-sql", "HO").await;
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Blotter scope filter + open-order count (design §5.1)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #[tokio::test]
 async fn blotter_scope_filter() {
@@ -778,9 +778,9 @@ async fn open_order_count_by_state() {
     cleanup_referents(&mut conn, env_a(), &sym, &dest, "u-sql", "HO").await;
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Catalog + borrow bootstrap (design §5.1)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 #[tokio::test]
 async fn catalog_bootstrap_loads_engine() {

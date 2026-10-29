@@ -11,8 +11,7 @@
 //! resolves ONLY in the aggregation-tree layout (both repos checked out
 //! side by side). Single-repo checkouts (CI) cannot resolve it; the
 //! include is feature-gated so the tree operator runs these flows with
-//! `--features cross_repo_flows` (backlog T8-HARNESS-1 tracks the
-//! SDK-side replacement).
+//! `--features cross_repo_flows`.
 #![cfg(feature = "cross_repo_flows")]
 //!
 //! Phases exercised in one running engine (the REAL desk + risk code, not
@@ -33,7 +32,7 @@
 //!   3. **Persist (allow)** - `persist_order_accepted` one-tx write
 //!      (order + event + `desk.outbox` row) via the SAME pattern the
 //!      handler runs; the outbox payload carries the FULL order snapshot
-//!      (payload-completeness, VDC-3) with every payload key Router's
+//! (payload-completeness,) with every payload key Router's
 //!      consumer (`route_accepted_order`) reads: `order_id`, `market_id`,
 //!      `office_id`, `client_order_id`, `symbol_name`, `side`, `qty.raw`,
 //!      `price.raw`/`price.scale`.
@@ -96,9 +95,9 @@ async fn desk_conn() -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
     pool.acquire().await.ok()
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Fixtures (same shapes as the sql_matrix catalog fixture)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Name uniqueness per CALL (not per process): parallel tests each seed
 /// their own symbol, and `catalog.symbol(name)` would otherwise resolve an
@@ -360,9 +359,9 @@ async fn cleanup_all(
     tx.commit().await.unwrap();
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // Risk double + wiring-level branches (pure, no DB)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// Allow leg: the REAL Risk engine (test double built on the production
 /// checks) allows a within-limit order and the verdict carries the trace
@@ -494,14 +493,14 @@ async fn wiring_none_allows_and_outage_fails_closed() {
     assert!(v2.is_err(), "outage must fail closed");
 }
 
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 // The DB legs (live db trade8; skip offline) - the full two-phase flow
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 /// The FULL allow flow: park → Risk authorize (double) → accept → persist
 /// (order + event + outbox, one tx) → the outbox payload carries every key
 /// Router's `route_accepted_order` consumer reads (payload-completeness,
-/// VDC-3) - the cross-service contract that makes `trade8:router` able to
+///) - the cross-service contract that makes `trade8: router` able to
 /// run from the event payload alone.
 #[tokio::test]
 async fn flow_allow_park_authorize_accept_persist_route_contract() {
@@ -570,7 +569,7 @@ async fn flow_allow_park_authorize_accept_persist_route_contract() {
 
     // The routed contract: the ORDER_ACCEPTED outbox payload carries every
     // key Router's `route_accepted_order` reads (payload-completeness,
-    // VDC-3) - a consumer must run from the payload alone.
+    //) - a consumer must run from the payload alone.
     let (family, payload): (String, serde_json::Value) = sqlx::query_as(
         r#"SELECT stream_family, payload FROM desk.outbox
            WHERE env_id = $1 AND event_type = $2 AND payload->>'order_id' = $3

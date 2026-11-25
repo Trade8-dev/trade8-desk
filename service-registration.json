@@ -6,7 +6,8 @@
       "telemetry_property": {
         "slug": "desk",
         "name": "Trade8:Desk Telemetry"
-      }
+      },
+      "exposure": "internal"
     }
   ]
 }
